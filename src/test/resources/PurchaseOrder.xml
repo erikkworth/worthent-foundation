@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PurchaseOrderData>
+    <!-- Comment -->
+    <PurchaseTimestamp>1234567890</PurchaseTimestamp>
+    <AccountId>ABCDEFGHIJK</AccountId>
+    <Items>
+        <PurchaseItemData itemNumber="1">
+            <Sku>YXY-123</Sku>
+            <Quantity>1</Quantity>
+            <Price>50.25</Price>
+            <Currency>USD</Currency>
+        </PurchaseItemData>
+        <PurchaseItemData itemNumber="1">
+            <Sku>YXY-555</Sku>
+            <Quantity>2</Quantity>
+            <Price>70.00</Price>
+            <Currency>USD</Currency>
+        </PurchaseItemData>
+    </Items>
+    <TaxRate>8.25</TaxRate>
+</PurchaseOrderData>

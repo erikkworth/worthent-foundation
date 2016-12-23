@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Class-Path: 
+Bundle-SymbolicName: com.worthent.foundation.state
+Bundle-Version: 0.0.0
+Bundle-Name: state
+Bundle-ManifestVersion: 2
+Bundle-Description: Service managing database connection pools to different databases
+Bundle-Vendor: worthent.com
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Export-Package: 
+ com.worthent.foundation.util.state,
+ com.worthent.foundation.util.state.annotation,
+ com.worthent.foundation.util.state.provider

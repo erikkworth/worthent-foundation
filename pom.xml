@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Copyright 2000-2011 Worth Enterprises, Inc. All Rights Reserved -->
+<!-- Copyright 2000-2016 Worth Enterprises, Inc. All Rights Reserved -->
 <project
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
   xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.worthent.foundation</groupId>
-  <artifactId>state</artifactId>
+  <artifactId>worthent-foundation</artifactId>
   <version>1.0.0</version>
   <packaging>jar</packaging>
-  <name>State Table</name>
+  <name>worthent-foundation</name>
   <description>
-      The State Table is a Utility Bundle providing a finite state machine implementation.
+    Core utilities for the Worth Enterprises suite of software components.
   </description>
 
   <properties>

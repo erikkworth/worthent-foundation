@@ -17,7 +17,7 @@ import java.util.List;
  * @author Erik K. Worth
  * @version $Id: StateTransitionDefImpl.java 2 2011-11-28 00:10:06Z erik.k.worth@gmail.com $
  */
-public final class StateTransitionDefImpl<D extends StateTableData, E extends StateEvent> implements StateTransitionDef<D, E> {
+public class StateTransitionDefImpl<D extends StateTableData, E extends StateEvent> implements StateTransitionDef<D, E> {
 
     /** The identifier of the event that triggers this state transition */
     private final String onEvent;

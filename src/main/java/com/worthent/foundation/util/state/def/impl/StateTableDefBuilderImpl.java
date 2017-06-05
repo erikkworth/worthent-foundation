@@ -103,14 +103,16 @@ public class StateTableDefBuilderImpl<D extends StateTableData, E extends StateE
                 if (TransitionActor.UNNAMED.equals(name)) {
                     name = method.getName();
                 }
-                if (hasAppropriateSignature(className, name, method)) {
+                final MethodActor.ArgumentType argumentType = getMethodArgumentType(className, name, method);
+                if (null != argumentType) {
                     final int modifiers = method.getModifiers();
                     if (Modifier.isStatic(modifiers)) {
-                        final MethodActor<D, E> methodActor = new MethodActor<>(method, name);
+                        final MethodActor<D, E> methodActor = new MethodActor<>(argumentType, method, name);
                         transitionActorManager.addTransitionActor(methodActor);
                     } else {
                         if (StateTableData.class.isAssignableFrom(annotatedClass)) {
-                            final MethodActor<D, E> methodActor = new MethodActor<>(annotatedClass, method, name);
+                            final MethodActor<D, E> methodActor =
+                                    new MethodActor<>(argumentType, annotatedClass, method, name);
                             transitionActorManager.addTransitionActor(methodActor);
                         } else {
                             LOGGER.warn("Ignoring actor, '{}', in class '{}', because the annotated method is not not static and the class does not extend {}",
@@ -193,8 +195,8 @@ public class StateTableDefBuilderImpl<D extends StateTableData, E extends StateE
     }
 
     /**
-     * Returns <code>true</code> when the annotated method has the appropriate
-     * method signature.
+     * Returns the type of argument the actor method expects or <code>null</code> when the method does not have a valid
+     * signature.
      *
      * @param className the name of the annotated class
      * @param actorName the name of the method actor
@@ -202,7 +204,8 @@ public class StateTableDefBuilderImpl<D extends StateTableData, E extends StateE
      * @return <code>true</code> when the annotated method has the appropriate
      *         method signature
      */
-    private static boolean hasAppropriateSignature(
+    @Nullable
+    private static MethodActor.ArgumentType getMethodArgumentType(
             @NotNull final String className,
             @NotNull final String actorName,
             @NotNull final Method method) {
@@ -211,20 +214,26 @@ public class StateTableDefBuilderImpl<D extends StateTableData, E extends StateE
         if (!Modifier.isPublic(modifiers)) {
             LOGGER.warn("Ignoring actor, '{}', in class '{}', because the annotated method is not public.",
                     actorName, className);
-            return false;
+            return null;
         }
-        if (types.length != 1) {
-            LOGGER.warn("Ignoring actor, '{}', in class '{}', because the method does not have 1 parameter.",
+        if (types.length == 0) {
+            return MethodActor.ArgumentType.NONE;
+        }
+        if (types.length > 1) {
+            LOGGER.warn("Ignoring actor, '{}', in class '{}', because the annotated method has more than one parameter.",
                     actorName, className);
-            return false;
+            return null;
         }
-        if (!TransitionContext.class.isAssignableFrom(types[0])) {
-            LOGGER.warn(
-                    "Ignoring actor, '{}', in class '{}', because the first method parameter is not a TransitionContext.",
-                    actorName, className);
-            return false;
+        if (TransitionContext.class.isAssignableFrom(types[0])) {
+            return MethodActor.ArgumentType.CONTEXT;
         }
-        // This method has the right signature
-        return true;
+        if (StateEvent.class.isAssignableFrom(types[0])) {
+            return MethodActor.ArgumentType.EVENT;
+        }
+        // This method has the wrong argument type
+        LOGGER.warn(
+                "Ignoring actor, '{}', in class '{}', because the first method parameter is not a supported type.",
+                actorName, className);
+        return null;
     }
 }

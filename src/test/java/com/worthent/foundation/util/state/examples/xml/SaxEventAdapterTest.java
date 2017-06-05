@@ -1,8 +1,7 @@
 package com.worthent.foundation.util.state.examples.xml;
 
-import com.worthent.foundation.util.state.StateExeException;
 import com.worthent.foundation.util.state.StateTableControl;
-import com.worthent.foundation.util.state.etc.obj.ObjectConstructionEvent;
+import com.worthent.foundation.util.state.etc.obj.ObjectConstructionController;
 import com.worthent.foundation.util.state.etc.xml.SaxEventAdapter;
 import com.worthent.foundation.util.state.etc.xml.XmlEvent;
 import com.worthent.foundation.util.state.etc.xml.XmlObjectBuilderAdapter;
@@ -42,8 +41,8 @@ public class SaxEventAdapterTest {
         }
     };
 
-    /** The list of events received */
-    private List<String> events;
+    /** The list of purchase orders received */
+    private List<PurchaseOrderData> purchaseOrders;
 
     /** The state table control object */
     private StateTableControl<XmlEvent> stateTableControl;
@@ -53,19 +52,9 @@ public class SaxEventAdapterTest {
 
     @Before
     public void setup() throws Exception {
-        events = new LinkedList<>();
-        stateTableControl = new XmlObjectBuilderAdapter(new StateTableControl<ObjectConstructionEvent>() {
-            @Override
-            public void start() throws StateExeException {
-            }
-            @Override
-            public void stop() throws StateExeException {
-            }
-            @Override
-            public void signalEvent(final ObjectConstructionEvent event) throws StateExeException {
-                events.add(event.getName());
-            }
-        });
+        purchaseOrders = new LinkedList<>();
+        stateTableControl = new XmlObjectBuilderAdapter(
+                new ObjectConstructionController<>(PurchaseOrderData.class, purchaseOrders::add));
         saxEventAdapter = new SaxEventAdapter(stateTableControl);
     }
 
@@ -78,6 +67,6 @@ public class SaxEventAdapterTest {
             SAXParser saxParser = factory.newSAXParser();
             saxParser.parse(inputStream, saxEventAdapter);
         }
-        LOGGER.debug("Events: {}", events);
+        LOGGER.debug("Purchase Orders: {}", purchaseOrders);
     }
 }

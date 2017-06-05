@@ -1,5 +1,8 @@
 package com.worthent.foundation.util.state.examples.xml;
 
+import com.worthent.foundation.util.state.etc.obj.ObjectConstructor;
+import com.worthent.foundation.util.state.etc.obj.ObjectField;
+
 import java.math.BigDecimal;
 
 /**
@@ -10,57 +13,63 @@ import java.math.BigDecimal;
 public class PurchaseItemData {
 
     /** Identifies the purchase item in the purchase order */
-    private int itemNumber;
+    private final int itemNumber;
 
     /** The identifier for the item purchased */
-    private String sku;
+    private final String sku;
 
     /** The quantity ordered */
-    private int quantity;
+    private final int quantity;
 
     /** The price per item */
-    private BigDecimal price;
+    private final BigDecimal price;
 
     /** The currency identifier */
-    private String currency;
+    private final String currency;
+
+    @ObjectConstructor
+    public PurchaseItemData(
+            @ObjectField("itemNumber") final int itemNumber,
+            @ObjectField("sku") final String sku,
+            @ObjectField("quantity") final int quantity,
+            @ObjectField("price") final BigDecimal price,
+            @ObjectField("currency") final String currency) {
+        this.itemNumber = itemNumber;
+        this.sku = sku;
+        this.quantity = quantity;
+        this.price = price;
+        this.currency = currency;
+    }
+
+    @Override
+    public String toString() {
+        return "PurchaseItemData{" +
+                "itemNumber=" + itemNumber +
+                ", sku='" + sku + '\'' +
+                ", quantity=" + quantity +
+                ", price=" + price +
+                ", currency='" + currency + '\'' +
+                '}';
+    }
 
     public int getItemNumber() {
         return itemNumber;
-    }
-
-    public void setItemNumber(int itemNumber) {
-        this.itemNumber = itemNumber;
     }
 
     public String getSku() {
         return sku;
     }
 
-    public void setSku(String sku) {
-        this.sku = sku;
-    }
-
     public int getQuantity() {
         return quantity;
-    }
-
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
     }
 
     public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(BigDecimal price) {
-        this.price = price;
-    }
-
     public String getCurrency() {
         return currency;
     }
 
-    public void setCurrency(String currency) {
-        this.currency = currency;
-    }
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright 2000-2011 Worth Enterprises, Inc. All rights reserved.
+ * Copyright 2000-2016 Worth Enterprises, Inc. All rights reserved.
  */
 package com.worthent.foundation.util.state.annotation;
 

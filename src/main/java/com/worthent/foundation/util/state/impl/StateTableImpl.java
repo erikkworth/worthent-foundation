@@ -25,8 +25,7 @@ import com.worthent.foundation.util.state.def.StateTableDef;
 public class StateTableImpl<D extends StateTableData, E extends StateEvent> implements StateTable<D, E> {
 
     /** Logger used for this class */
-    private static final Logger LOGGER =
-        LoggerFactory.getLogger(StateTableImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(StateTableImpl.class);
 
     /** The state table error handler to use */
     private final StateErrorHandler errorHandler;

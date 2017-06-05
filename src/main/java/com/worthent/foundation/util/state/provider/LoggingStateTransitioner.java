@@ -4,6 +4,7 @@
 package com.worthent.foundation.util.state.provider;
 
 import com.worthent.foundation.util.state.*;
+import com.worthent.foundation.util.state.def.StateDef;
 import org.slf4j.Logger;
 
 /**
@@ -58,10 +59,13 @@ public class LoggingStateTransitioner<D extends StateTableData, E extends StateE
      */
     @Override
     public void onTransition(final TransitionContext<D, E> context) throws StateExeException {
+        final String toState = StateDef.STATE_CHANGE_BY_ACTOR.equals(context.getToState())
+                ? context.getStateTableData().getCurrentState()
+                : context.getToState();
         logger.debug(TRANSITION_MESSAGE,
                 context.getStateTable().getStateTableName(),
                 context.getFromState(),
-                context.getToState(),
+                toState,
                 context.getEvent().toString());
     }
 }

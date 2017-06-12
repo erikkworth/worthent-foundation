@@ -8,7 +8,6 @@ package com.worthent.foundation.util.state;
  * the state transition engine.
  * 
  * @author Erik K. Worth
- * @version $Id: StateTableControl.java 2 2011-11-28 00:10:06Z erik.k.worth@gmail.com $
  */
 public interface StateTableControl<E extends StateEvent> {
 

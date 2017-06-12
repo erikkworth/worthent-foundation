@@ -29,13 +29,13 @@ public class SerialStateTableControlTest {
 
     private static final StateEvent ON_EVENT = StateEvents.enumeratedStateEvent(TurnstileEventType.ON);
     private static final StateEvent PUSH_EVENT = StateEvents.enumeratedStateEvent(TurnstileEventType.PUSH);
-    private static final StateEvent COIN_EVENT = StateEvents.enumeratedStateEvent(TurnstileEventType.COIN);
+    private static final StateEvent TICKET_EVENT = StateEvents.enumeratedStateEvent(TurnstileEventType.TICKET);
     private static final StateEvent OFF_EVENT = StateEvents.enumeratedStateEvent(TurnstileEventType.OFF);
 
     /** State table data */
     private TurnstileData stateTableData;
 
-    /** State table representing a coin-operated turnstile like you find in amusement parks */
+    /** State table representing a turnstile like you find in amusement parks */
     private final StateTable<TurnstileData, StateEvent> turnstileStateTable =
         new StateTableBuilderImpl<TurnstileData, StateEvent>()
             .withStateTableDefinition()
@@ -46,7 +46,7 @@ public class SerialStateTableControlTest {
                     .withDefaultEventHandler().toState(StateDef.STAY_IN_STATE).endTransition()
                     .endState()
                 .withState(TurnstileStates.LOCKED.name())
-                    .transitionOnEvent(TurnstileEventType.COIN.name())
+                    .transitionOnEvent(TurnstileEventType.TICKET.name())
                         .toState(TurnstileStates.UNLOCKED.name())
                         .withActorsByName(TurnstileData.INCREMENT_COUNT)
                         .endTransition()
@@ -55,7 +55,7 @@ public class SerialStateTableControlTest {
                     .withDefaultEventHandler(StateTransitionDefs.getUnexpectedEventDefaultTransition())
                     .endState()
                 .withState(TurnstileStates.UNLOCKED.name())
-                    .transitionOnEvent(TurnstileEventType.COIN.name()).toState(StateDef.STAY_IN_STATE).endTransition()
+                    .transitionOnEvent(TurnstileEventType.TICKET.name()).toState(StateDef.STAY_IN_STATE).endTransition()
                     .transitionOnEvent(TurnstileEventType.PUSH.name())
                         .toState(TurnstileStates.LOCKED.name())
                         .withActorsByName(TurnstileData.INCREMENT_COUNT)
@@ -91,12 +91,12 @@ public class SerialStateTableControlTest {
     public void testOneTurnstileEntry() throws Exception {
         stateTableController.start();
         stateTableController.signalEvent(ON_EVENT);
-        stateTableController.signalEvent(COIN_EVENT);
+        stateTableController.signalEvent(TICKET_EVENT);
         stateTableController.signalEvent(PUSH_EVENT);
         stateTableController.signalEvent(OFF_EVENT);
 
         assertEquals("Expected Turn Count", 1, stateTableData.getTurnCount());
-        assertEquals("Expected Coin Count", 1, stateTableData.getCoinCount());
+        assertEquals("Expected Ticket Count", 1, stateTableData.getTicketCount());
     }
 
     @Test
@@ -107,14 +107,14 @@ public class SerialStateTableControlTest {
         stateTableController.signalEvent(PUSH_EVENT);
 
         assertEquals("Expected Turn Count", 0, stateTableData.getTurnCount());
-        assertEquals("Expected Coin Count", 0, stateTableData.getCoinCount());
+        assertEquals("Expected Ticket Count", 0, stateTableData.getTicketCount());
 
-        stateTableController.signalEvent(COIN_EVENT);
+        stateTableController.signalEvent(TICKET_EVENT);
         stateTableController.signalEvent(PUSH_EVENT);
         stateTableController.signalEvent(OFF_EVENT);
 
         assertEquals("Expected Turn Count", 1, stateTableData.getTurnCount());
-        assertEquals("Expected Coin Count", 1, stateTableData.getCoinCount());
+        assertEquals("Expected Ticket Count", 1, stateTableData.getTicketCount());
     }
 
     @Test(expected=StateExeException.class)

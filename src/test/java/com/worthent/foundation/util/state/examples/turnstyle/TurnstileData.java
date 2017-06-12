@@ -8,33 +8,33 @@ import com.worthent.foundation.util.state.annotation.Actor;
 /** The state table data object for the turnstile */
 public class TurnstileData extends AbstractStateTableData {
 
-    /** The name of the actor that increments the turn and coin counts */
+    /** The name of the actor that increments the turn and ticket counts */
     public static final String INCREMENT_COUNT = "incrementCount";
 
     /** The number of people that passed through the turnstile */
     private int turnCount;
-    /** The number of coins put into the turnstile */
-    private int coinCount;
+    /** The number of tickets scanned for the turnstile */
+    private int ticketCount;
 
     /** Construct in initial state */
     public TurnstileData() {
         super(TurnstileStates.OFF.name(), TurnstileStates.OFF.name());
         turnCount = 0;
-        coinCount = 0;
+        ticketCount = 0;
     }
 
     /** Copy constructor */
     public TurnstileData(final TurnstileData other) {
         super(other);
         this.turnCount = other.getTurnCount();
-        this.coinCount = other.getCoinCount();
+        this.ticketCount = other.getTicketCount();
     }
 
     /** Set from other state */
     public void set(final TurnstileData other) {
         super.set(other);
         this.turnCount = other.getTurnCount();
-        this.coinCount = other.getCoinCount();
+        this.ticketCount = other.getTicketCount();
     }
 
     /** Actor used to increment a counter based on the event type */
@@ -43,8 +43,8 @@ public class TurnstileData extends AbstractStateTableData {
         final String eventName = context.getEvent().getName();
         if (TurnstileEventType.PUSH.name().equals(eventName)) {
             turnCount++;
-        } else if (TurnstileEventType.COIN.name().equals(eventName)) {
-            coinCount++;
+        } else if (TurnstileEventType.TICKET.name().equals(eventName)) {
+            ticketCount++;
         }
     }
 
@@ -53,6 +53,6 @@ public class TurnstileData extends AbstractStateTableData {
         return turnCount;
     }
 
-    /** Returns the current coin count */
-    public int getCoinCount() { return coinCount; }
+    /** Returns the current ticket count */
+    public int getTicketCount() { return ticketCount; }
 }

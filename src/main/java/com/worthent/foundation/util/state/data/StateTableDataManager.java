@@ -25,7 +25,7 @@ public interface StateTableDataManager<D extends StateTableData, E extends State
     void initializeStateTableData() throws StateDefException;
 
     /**
-     * Returns a copy of the state table data object that minimally holds the
+     * Returns a reference to the state table data object that minimally holds the
      * current and prior states of the state table instance. This method is
      * called by the engine when the event processing begins for the specified
      * event. This method is often implemented to return a copy of the data that

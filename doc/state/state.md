@@ -20,6 +20,7 @@ When you are writing code where there exists in the underlying domain some set o
 Perhaps the best way to explain what state tables can do is by presenting a simple example.  Let's take a look at how a state table might be used to control a turnstile like the kind you find at the zoo.
 
 **Turnstile**
+
 ![Turnstile](turnstile.jpg)
 
 The above turnstile is a modern one at the San Diego Safari Park at the park entrance.  When the attendant scans your ticket, the bars will turn (the three rotate together from the point where they all extend out) to allow one person to push through.
@@ -27,6 +28,7 @@ The above turnstile is a modern one at the San Diego Safari Park at the park ent
 State Machines are often modeled using state transition diagrams that use ovals to represent each of the states in which a system can exist, and connect the states using arrows where the arrows represent the transition from one state to another (in the direction of the arrow) when a specific event arrives.  Software implementations of a state table typically can execute some procedures as the state machine transitions from one state to another (thus, they are said to do work on the state transition).  Here is a state table diagram for the turnstile.
 
 **Turnstile State Transition Diagram**
+
 ![Turnstile](TurnstileStateDiagram.png)
 
 State Tables typically have a starting state.  Here the reasonable starting state is for the machine to be turned off.  When in the Off state the turnstile can be turned on with an On event.  Presumably this event would be emitted to the State Table when the machine was powered on.
@@ -182,13 +184,64 @@ public class TurnstileData extends AbstractStateTableData {
     public int getTicketCount() { return ticketCount; }
 }
 ```
+
+### State Table Data Manager
+
 Since state tables can be used to solve very different kinds of problems, we need to support different ways to manage the data.  As you will see in the example a little later that the State Table Data Manager is able to perform three operations on your data object:
 
 * initialize: you provide the construction operation when there is no data yet
 * get: you provide the getter that is able to fetch the data
 * set: you provide the setter that is able to set the data when the transition completes
 
-Your state table may not require all of these depending on your data management needs, but you will minimally need to provide the get operation.  With the three operations available to you, you can provide code that:
+Here is the interface that specifies the `StateTableDataManager`:
+```java
+public interface StateTableDataManager<D extends StateTableData, E extends StateEvent> {
+    /**
+     * Sets the current state in the state table data object to the initial
+     * state of the state table. This is typically called from the
+     * implementation of the {@link StateTableControl#start()} method.
+     *
+     * @throws StateDefException thrown when there is an error initializing the
+     *             state table
+     */
+    void initializeStateTableData() throws StateDefException;
+
+    /**
+     * Returns a reference to the state table data object that minimally holds the
+     * current and prior states of the state table instance. This method is
+     * called by the engine when the event processing begins for the specified
+     * event. This method is often implemented to return a copy of the data that
+     * is then modified by the state transition actors. If the processing completes
+     * successfully, the engine sets the updated copy back into this state table via
+     * a call to {@link #setStateTableData(StateEvent, StateTableData)}.
+     *
+     * @param event the event being processed
+     *
+     * @throws StateExeException thrown when there is an error retrieving the
+     *             state history
+     */
+    D getStateTableData(E event) throws StateExeException;
+
+    /**
+     * Updates the state table instance with a new value of the data object that
+     * minimally holds the current and prior states of the state table instance.
+     * This method is called by the engine when the processing has completed
+     * successfully for the event. The data object passed in here is the updated
+     * copy modified by the state transition actors.
+     *
+     * @param event the event that triggered the state table to update its data
+     * @param dataObject the new data object to set into the state table
+     *            instance
+     *
+     * @throws StateExeException thrown when there is an error setting the state
+     *             history
+     */
+    void setStateTableData(E event, D dataObject) throws StateExeException;
+}
+```
+The builder provides an implementation of this class that uses lambdas so that you can specify the each of the operations directly in the builder, but can also provide your own implementation of the data manager and set that into the State Table using the builder.
+
+Your state table may not require special implementations for all three of the data management operations depending on your data management needs, but you will minimally need to provide the get operation to the builder (it provides no-op operations for the others when left out).  With the three operations available to you, you can provide code that:
 
 * reads the data from a database, creates a default instance when there is no data yet, writes the updated data back to the database if and only if all the Transition Actors succeed
 * reads the data from a class variable and lets the Transition Actors make changes directly to the single copy
@@ -351,7 +404,29 @@ There are (or will be) multiple implementations of the `StateTableControl` that 
 * `SingleThreadConsumerStateTableControl` (not yet implemented in v1.0): This implementation is thread safe and directs all events to a queue that is consumed by a single thread that feeds the events to the state table in the order received (with the exception of events submitted by an actor).  This version is good for processing transactional events where order is important but throughput is less important.
 * `MultiThreadedConsumerStateTableControl` (not yet implemented in v1.0): This implementation is thread safe and uses a hash algorithm to dispatch a value from the event (a data ID) to one of multiple queues each of which have their own thread consuming events and feeding them into the state table.  This provides a higher throughput capacity while preserving the order for events with the same data ID.
 
+The `SerialStateTableControl` objects invokes the initializer on the State Table Data Manager.
+
 All of them (will) use the same underlying `StateEngine` implementation that process the transition on an event.  The difference is how the events are queued, consumed by threads from a thread pool, and feed into the `StateEngine`.
+
+The `StateEngine` processes a single event submitted by the `StateTableControl` following these steps:
+
+1. Retrieve the State Table Definition from the State Table
+1. Retrieve the State Table Data object using the getter from the State Table Data Manager passing the event as an argument
+1. Reads the current state from the State Table Data
+1. Uses the current state to get the State definition from the State Table Definition
+1. Uses the event name from the State Event to lookup the State Transition Definition from the State Definition
+1. Determines the target state from the State Transition Definition
+1. Creates a Transition Context object with the following data:
+   * Current State
+   * Target State
+   * State Table
+   * State Table Data
+   * State Table Control
+   * Event
+1. Get the list of Transition Actors
+1. Invoke each Transition Actor in order
+1. Get the State Transitioner from the State Table and invoke it if not `null`
+1. Call the setter on the State Table Data Manager to set the updated data
 
 The turnstile state table uses the `SerialStateTableControl` to process events.  It is configured like this:
 ```java

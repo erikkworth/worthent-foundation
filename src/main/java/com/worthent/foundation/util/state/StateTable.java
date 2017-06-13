@@ -34,7 +34,7 @@ public interface StateTable<D extends StateTableData, E extends StateEvent> {
      * Returns the registered handler that responds to state transition errors
      * or <code>null</code> if none is registered.
      */
-    StateErrorHandler getErrorHandler();
+    StateErrorHandler<D, E> getErrorHandler();
 
     /** Returns the state table metadata */
     StateTableDef<D, E> getStateTableDefinition(E event) throws StateExeException;

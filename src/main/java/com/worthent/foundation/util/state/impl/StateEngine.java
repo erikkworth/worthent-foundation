@@ -54,9 +54,6 @@ public final class StateEngine<D extends StateTableData, E extends StateEvent> {
     private static final Logger LOGGER =
         LoggerFactory.getLogger(StateEngine.class);
 
-    /** Single instance of this class */
-    private static final StateEngine INSTANCE = new StateEngine();
-
     /**
      * The constant indicating a state or event is "Unknown" for logging
      * purposes
@@ -254,14 +251,13 @@ public final class StateEngine<D extends StateTableData, E extends StateEvent> {
      * @param actor the transition actor if applicable
      * @param cause the cause of the error
      */
-    public final void invokeErrorHandler(
-        final TransitionContext context,
-        final TransitionActor actor,
-        final Exception cause) {
+    private void invokeErrorHandler(
+            final TransitionContext<D, E> context,
+            final TransitionActor<D, E> actor,
+            final Exception cause) {
         try {
-            StateErrorHandler errorHandler = context.getStateTable().getErrorHandler();
+            StateErrorHandler<D, E> errorHandler = context.getStateTable().getErrorHandler();
             if (null != errorHandler) {
-
                 // Forward to registered error handler
                 errorHandler.onError(context, actor, cause);
             }

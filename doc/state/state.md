@@ -19,11 +19,21 @@ When you are writing code where there exists in the underlying domain some set o
 
 Perhaps the best way to explain what state tables can do is by presenting a simple example.  Let's take a look at how a state table might be used to control a turnstile like the kind you find at the zoo.
 
+The example is organized to explain these topics:
+
+* [Enumerate the States](#enumerate-the-states)
+* [Define Events](#define-events)
+* [Implement the State Table Data Object](#implement-the-state-table-data-object)
+* [State Table Data Manager](#state-table-data-manager)
+* [Transition Actors](#transition-actors)
+* [State Table Definition](#state-table-definition)
+* [State Table Controller](#state-table-controller)
+
 **Turnstile**
 
 ![Turnstile](turnstile.jpg)
 
-The above turnstile is a modern one at the San Diego Safari Park at the park entrance.  When the attendant scans your ticket, the bars will turn (the three rotate together from the point where they all extend out) to allow one person to push through.
+The above turnstile is a modern one at the park entrance for my favorite zoo.  When the attendant scans your ticket, the bars will turn (the three rotate together from the point where they all extend out) to allow one person to push through.
 
 State Machines are often modeled using state transition diagrams that use ovals to represent each of the states in which a system can exist, and connect the states using arrows where the arrows represent the transition from one state to another (in the direction of the arrow) when a specific event arrives.  Software implementations of a state table typically can execute some procedures as the state machine transitions from one state to another (thus, they are said to do work on the state transition).  Here is a state table diagram for the turnstile.
 
@@ -33,11 +43,11 @@ State Machines are often modeled using state transition diagrams that use ovals 
 
 State Tables typically have a starting state.  Here the reasonable starting state is for the machine to be turned off.  When in the Off state the turnstile can be turned on with an On event.  Presumably this event would be emitted to the State Table when the machine was powered on.
 
-When the turnstile state table receives the On event while it is in the Off state, the state table transitions to the Locked state.  While in the Off or Locked state, the turnstile does not turn.  The Push event is signaled to the state table when a person tries to push through the turnstile.  If the Push event is signaled to the state table while it is in the Locked state, the turnstile does not turn and the state table stays in the same state (Locked).  In the diagram, that is represented by an arrow that circles back to the same state.
+When the turnstile state table receives the On event while it is in the Off state, the state table transitions to the Locked state.  While in the Off or Locked state, the turnstile does not turn.  The Push event is signaled to the state table when a person tries to push through the turnstile.  If the Push event is signaled to the state table while it is in the Locked state, the turnstile does not turn and the state table stays in the same state (Locked).  In the diagram, a transition that keeps the state table in the same state is represented by an arrow that circles back to the same state.
 
-In order for a person to get through the turnstile, the attendant needs to scan a ticket while the state table is in the Locked state.  When the ticket is scanned, the device signals a Ticket event to the state table.  When it is in the Locked state, the state table transitions to the Unlocked state.  The \[Increment Count\] on the diagram below the Ticket event signifies that the **Increment Count** Transition Actor is invoked as the state table transitions from the Locked to the Unlocked state.  Now that the state table is in the Unlocked state, the person will be able to push through.  The Push event triggers the state table to transition back to the Locked state until the next ticket scan.
+In order for a person to get through the turnstile, the attendant needs to scan a ticket while the state table is in the Locked state.  When the ticket is scanned, the device signals a Ticket event to the state table.  When the Ticket event arrives while the state table is in the Locked state, the state table transitions to the Unlocked state.  The \[Increment Count\] on the diagram below the Ticket event signifies that the **Increment Count** Transition Actor is invoked as the state table transitions from the Locked to the Unlocked state.  Now that the state table is in the Unlocked state, the person will be able to push through.  The Push event triggers the state table to transition back to the Locked state until the next ticket scan.
 
-A **Transition Actor** is a piece of code that is configured to run during the state transition.  A given Transition Action can be used in multiple places in the state table and you can see from the diagram that it is indeed used in two places (one with the Ticket event and the other with the Push event).  The configuration for a state transition between two states can list more than one and they run in the order they are listed.
+A **Transition Actor** is a piece of code that is configured to run during the state transition.  A given Transition Actor can be used in multiple places in the state table and you can see from the diagram that it is indeed used in two places (one with the Ticket event and the other with the Push event).  The configuration for a state transition between two states can list more than one and they run in the order they are listed.
 
 So now you have an overview of the concept, so let's break down the machine into its parts.  At the high level, the state table has these parts:
 
@@ -103,7 +113,7 @@ For simple state tables like the turnstile, your events may not carry any data, 
 ```
 There are some other helper classes that implement the State Event interface that you can use if your events carry data.  You can use the `StateEvents.builder(String eventName)` to get a builder that will build an event with data carried in a backing map.  You can also implement your own classes.
 
-### State Table Data
+### Implement the State Table Data Object
 
 Most of the logic that you provide is encapsulated in the State Table Data object.  You need to implement a class that implements `StateTableData`:
 ```java
@@ -189,7 +199,7 @@ public class TurnstileData extends AbstractStateTableData {
 
 Since state tables can be used to solve very different kinds of problems, we need to support different ways to manage the data.  As you will see in the example a little later that the State Table Data Manager is able to perform three operations on your data object:
 
-* initialize: you provide the construction operation when there is no data yet
+* initialize: you provide the logic to perform any initialization - this is invoked only once and not per event
 * get: you provide the getter that is able to fetch the data
 * set: you provide the setter that is able to set the data when the transition completes
 
@@ -239,7 +249,7 @@ public interface StateTableDataManager<D extends StateTableData, E extends State
     void setStateTableData(E event, D dataObject) throws StateExeException;
 }
 ```
-The builder provides an implementation of this class that uses lambdas so that you can specify the each of the operations directly in the builder, but can also provide your own implementation of the data manager and set that into the State Table using the builder.
+The builder provides an implementation of this class that uses lambdas so that you can specify the each of the operations directly in the builder, but you can also provide your own implementation of the data manager and set that into the State Table using the builder.
 
 Your state table may not require special implementations for all three of the data management operations depending on your data management needs, but you will minimally need to provide the get operation to the builder (it provides no-op operations for the others when left out).  With the three operations available to you, you can provide code that:
 
@@ -251,15 +261,15 @@ The options you provide depend on the requirements you have to support transacti
 
 The `TurnstileData` object above supports atomic updates by providing:
 
-* initialize: a default constructor that initializes the state table states and other data
+* initialize: calls the default constructor to set an instance variable to a data object value with the current and prior states set to the Off state
 * get: a copy constructor that creates a copy of the data to preserve the original data in case there is an error
 * set: a set method that uses the data in the copy to update the original value (the source of truth)
 
-The turnstile state table always works on a copy of the data.  Only when the transition completes successfully does the state table set the state table data.  If there is an error, the state is left in the original state (before the event) and the rest of the data remains unchanged.  This is probably overkill for this specific example, but I wanted to show all the parts to give you an idea of what is available.
+The turnstile state table always works on a copy of the data.  Only when the transition completes successfully does the state table set the state table data.  If there is an error, the state is left in the original state (before the event) and the rest of the data remains unchanged.  This is probably overkill for this specific example, but I wanted to show all the parts to give you an idea of what is available.  More real-time state tables will not copy the data for every event and just work with the same instance of the data (and only provide the getter).
 
 ### Transition Actors
 
-Please take note of the `increment` method with the `@Actor` tag on it.  This is the easiest way to create the code for a Transition Actor that does work during state transitions.  The `TransitionActor` specifies the interface that all Transition Actors implement:
+Please take note of the `increment` method in the `TurnstileData` object with the `@Actor` tag on it.  This is the easiest way to create the code for a Transition Actor that does work during state transitions.  The `TransitionActor` specifies the interface that all Transition Actors implement:
 
 ```java
 public interface TransitionActor<D extends StateTableData, E extends StateEvent> {
@@ -304,44 +314,44 @@ The only Transition Actor in the `TurnstileData` simply increments a count for t
 Now it might be helpful to refer back to the State Transition Diagram above to recall the states and transitions for the turnstile so you can see how the diagram maps to the construction of the state table definition using the builder.  Here is how you create the turnstile state table definition along with the state table data as a class instance variable:
 
 ```java
-    /** State table data */
-    private TurnstileData stateTableData;
+/** State table data */
+private TurnstileData stateTableData;
 
-    /** State table representing a turnstile like you find in amusement parks */
-    private final StateTable<TurnstileData, StateEvent> turnstileStateTable =
-        new StateTableBuilderImpl<TurnstileData, StateEvent>()
-            .withStateTableDefinition()
-                .setName("Turnstile")
-                .usingActorsInClass(TurnstileData.class)
-                .withState(TurnstileStates.OFF.name())
-                    .transitionOnEvent(TurnstileEventType.ON.name()).toState(TurnstileStates.LOCKED.name()).endTransition()
-                    .withDefaultEventHandler().toState(StateDef.STAY_IN_STATE).endTransition()
-                    .endState()
-                .withState(TurnstileStates.LOCKED.name())
-                    .transitionOnEvent(TurnstileEventType.TICKET.name())
-                        .toState(TurnstileStates.UNLOCKED.name())
-                        .withActorsByName(TurnstileData.INCREMENT_COUNT)
-                        .endTransition()
-                    .transitionOnEvent(TurnstileEventType.PUSH.name()).toState(StateDef.STAY_IN_STATE).endTransition()
-                    .transitionOnEvent(TurnstileEventType.OFF.name()).toState(TurnstileStates.OFF.name()).endTransition()
-                    .withDefaultEventHandler(StateTransitionDefs.getUnexpectedEventDefaultTransition())
-                    .endState()
-                .withState(TurnstileStates.UNLOCKED.name())
-                    .transitionOnEvent(TurnstileEventType.TICKET.name()).toState(StateDef.STAY_IN_STATE).endTransition()
-                    .transitionOnEvent(TurnstileEventType.PUSH.name())
-                        .toState(TurnstileStates.LOCKED.name())
-                        .withActorsByName(TurnstileData.INCREMENT_COUNT)
-                        .endTransition()
-                    .transitionOnEvent(TurnstileEventType.OFF.name()).toState(TurnstileStates.OFF.name()).endTransition()
-                    .withDefaultEventHandler(StateTransitionDefs.getUnexpectedEventDefaultTransition())
-                    .endState()
-                .endDefinition()
-            .withStateTableDataManager()
-                .withInitializer(() -> stateTableData = new TurnstileData())
-                .withDataGetter((e) -> new TurnstileData(stateTableData))
-                .withDataSetter((e, updatedData) -> stateTableData.set(updatedData))
-                .endDataManager()
-            .build();
+/** State table representing a turnstile like you find in amusement parks */
+private final StateTable<TurnstileData, StateEvent> turnstileStateTable =
+    new StateTableBuilderImpl<TurnstileData, StateEvent>()
+        .withStateTableDefinition()
+            .setName("Turnstile")
+            .usingActorsInClass(TurnstileData.class)
+            .withState(TurnstileStates.OFF.name())
+                .transitionOnEvent(TurnstileEventType.ON.name()).toState(TurnstileStates.LOCKED.name()).endTransition()
+                .withDefaultEventHandler().toState(StateDef.STAY_IN_STATE).endTransition()
+                .endState()
+            .withState(TurnstileStates.LOCKED.name())
+                .transitionOnEvent(TurnstileEventType.TICKET.name())
+                    .toState(TurnstileStates.UNLOCKED.name())
+                    .withActorsByName(TurnstileData.INCREMENT_COUNT)
+                    .endTransition()
+                .transitionOnEvent(TurnstileEventType.PUSH.name()).toState(StateDef.STAY_IN_STATE).endTransition()
+                .transitionOnEvent(TurnstileEventType.OFF.name()).toState(TurnstileStates.OFF.name()).endTransition()
+                .withDefaultEventHandler(StateTransitionDefs.getUnexpectedEventDefaultTransition())
+                .endState()
+            .withState(TurnstileStates.UNLOCKED.name())
+                .transitionOnEvent(TurnstileEventType.TICKET.name()).toState(StateDef.STAY_IN_STATE).endTransition()
+                .transitionOnEvent(TurnstileEventType.PUSH.name())
+                    .toState(TurnstileStates.LOCKED.name())
+                    .withActorsByName(TurnstileData.INCREMENT_COUNT)
+                    .endTransition()
+                .transitionOnEvent(TurnstileEventType.OFF.name()).toState(TurnstileStates.OFF.name()).endTransition()
+                .withDefaultEventHandler(StateTransitionDefs.getUnexpectedEventDefaultTransition())
+                .endState()
+            .endDefinition()
+        .withStateTableDataManager()
+            .withInitializer(() -> stateTableData = new TurnstileData())
+            .withDataGetter((e) -> new TurnstileData(stateTableData))
+            .withDataSetter((e, updatedData) -> stateTableData.set(updatedData))
+            .endDataManager()
+        .build();
 ```
 
 The state table definition is built using a collection of builders for the various parts in a fluid way.  State table definitions are immutable once built.  They are defined with two generic arguments: one for the concrete data type and the other for the event type (most non-trivial state tables do not use the base `StateEvent` but a more derived class for the event type).
@@ -406,7 +416,7 @@ There are (or will be) multiple implementations of the `StateTableControl` that 
 
 The `SerialStateTableControl` objects invokes the initializer on the State Table Data Manager.
 
-All of them (will) use the same underlying `StateEngine` implementation that process the transition on an event.  The difference is how the events are queued, consumed by threads from a thread pool, and feed into the `StateEngine`.
+All of them (will) use the same underlying `StateEngine` implementation that process the transition on an event.  The differences for how the events are queued, consumed by threads from a thread pool, and feed into the `StateEngine`, are all encapsulated in the implementation of the `StateTableControl`.
 
 The `StateEngine` processes a single event submitted by the `StateTableControl` following these steps:
 
@@ -428,7 +438,7 @@ The `StateEngine` processes a single event submitted by the `StateTableControl` 
 1. Get the State Transitioner from the State Table and invoke it if not `null`
 1. Call the setter on the State Table Data Manager to set the updated data
 
-The turnstile state table uses the `SerialStateTableControl` to process events.  It is configured like this:
+The turnstile state table uses the `SerialStateTableControl` to process events.  Create an instance of it using the constructor and pass the state table definition as an argument.  That's it:
 ```java
     private StateTableControl<StateEvent> stateTableController;
 
@@ -451,5 +461,13 @@ You can get the push and ticket counts from the data object at the end.  I have 
         assertEquals("Expected Turn Count", 1, stateTableData.getTurnCount());
         assertEquals("Expected Ticket Count", 1, stateTableData.getTicketCount());
 ```
+
+In this example you have seen how to create a state table and feed it events.  Here are the programming tasks as a recap:
+
+1. [Enumerate the States](#enumerate-the-states)
+1. [Define Events](#define-events)
+1. [Implement the State Table Data Object (with Actors)](#implement-the-state-table-data-object)
+1. [Define the State Table Using the Builder](#state-table-definition)
+1. [Construct the State Table Controller](#state-table-controller)
 
 Next, I will present a more complex (and useful) example that parses XML documents to create Java Data Transfer Objects.

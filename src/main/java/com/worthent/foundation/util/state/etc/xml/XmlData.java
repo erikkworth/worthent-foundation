@@ -21,34 +21,34 @@ import static com.worthent.foundation.util.condition.Preconditions.checkNotNull;
 public class XmlData extends AbstractStateTableData {
 
     /** The name of the actor that processes a type of XML Event */
-    public static final String PROCESS_DOCUMENT_START = "processDocumentStart";
+    static final String PROCESS_DOCUMENT_START = "processDocumentStart";
 
     /** The name of the actor that processes a type of XML Event */
-    public static final String PROCESS_DOCUMENT_END = "processDocumentEnd";
+    static final String PROCESS_DOCUMENT_END = "processDocumentEnd";
 
     /** The name of the actor that processes a type of XML Event */
-    public static final String PROCESS_ELEMENT_START = "processElementStart";
+    static final String PROCESS_ELEMENT_START = "processElementStart";
 
     /** The name of the actor that can signal an Object Construction Root Start Event */
-    public static final String SIGNAL_ROOT_START = "signalRootStart";
+    static final String SIGNAL_ROOT_START = "signalRootStart";
 
     /** The name of the actor that can signal an Object Construction Entity Start Event */
-    public static final String SIGNAL_ENTITY_START = "signalEntityStart";
+    static final String SIGNAL_ENTITY_START = "signalEntityStart";
 
     /** The name of the actor that processes a type of XML Event */
-    public static final String PROCESS_ELEMENT_END = "processElementEnd";
+    static final String PROCESS_ELEMENT_END = "processElementEnd";
 
     /** The name of the actor that signals an Object Construction Simple Value Event */
-    public static final String SIGNAL_SIMPLE_VALUE = "signalSimpleValue";
+    static final String SIGNAL_SIMPLE_VALUE = "signalSimpleValue";
 
     /** The name of the actor that signals an Object Construction Object Value Event */
-    public static final String SIGNAL_OBJECT_DONE = "signalValue";
+    static final String SIGNAL_OBJECT_DONE = "signalValue";
 
     /** The name of the actor that processes a type of XML Event */
-    public static final String PROCESS_CHARACTER_DATA = "processCharacterData";
+    static final String PROCESS_CHARACTER_DATA = "processCharacterData";
 
     /** The name of the actor that processes a type of XML Event */
-    public static final String PROCESS_WHITESPACE = "processWhitespace";
+    static final String PROCESS_WHITESPACE = "processWhitespace";
 
     /** Controller for the Object Construction State Table able to create objects from construction events */
     private final StateTableControl<ObjectConstructionEvent> stateTableControl;
@@ -68,20 +68,22 @@ public class XmlData extends AbstractStateTableData {
     /**
      * Construct with the controller to the state table that is able to build an object structure from events.
      */
-    public XmlData(@NotNull final StateTableControl<ObjectConstructionEvent> stateTableControl) {
+    XmlData(@NotNull final StateTableControl<ObjectConstructionEvent> stateTableControl) {
         super(XmlObjectStates.AWAITING_DOCUMENT.name(), XmlObjectStates.AWAITING_DOCUMENT.name());
         this.stateTableControl = checkNotNull(stateTableControl, "stateTableControl must not be null");
         elementStack = new LinkedList<>();
         fieldValue = new StringBuilder();
-        lineNumber = 0;
+        lineNumber = 1;
         documentStarted = false;
     }
 
-    public int getLineNumber() {
+    /** Returns the line number for the current location in the XML document being parsed */
+    int getLineNumber() {
         return lineNumber;
     }
 
-    public String getElementPath() {
+    /** Returns the element path into the current portion of the XML document being parsed */
+    String getElementPath() {
         return elementStack.stream().collect(Collectors.joining("/"));
     }
 
@@ -104,7 +106,7 @@ public class XmlData extends AbstractStateTableData {
             throw new StateExeException("Unexpected End of Document at line " + lineNumber +
                     ".  Missing End Elements for element(s): " + elementStack);
         }
-        stateTableControl.signalEvent(ObjectConstructionEvent.newDoneEvent());
+        stateTableControl.signalEvent(ObjectConstructionEvent.getDoneEvent());
     }
 
     @Actor(name = PROCESS_ELEMENT_START)
@@ -128,7 +130,7 @@ public class XmlData extends AbstractStateTableData {
 
     @Actor(name = SIGNAL_ROOT_START)
     public void signalRootStart() throws StateExeException {
-        stateTableControl.signalEvent(ObjectConstructionEvent.newRootStartEvent());
+        stateTableControl.signalEvent(ObjectConstructionEvent.getRootStartEvent());
     }
 
     @Actor(name = SIGNAL_ENTITY_START)

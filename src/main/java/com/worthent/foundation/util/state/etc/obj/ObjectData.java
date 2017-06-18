@@ -22,22 +22,22 @@ public class ObjectData<T> extends AbstractStateTableData {
     private static final Logger LOGGER = LoggerFactory.getLogger(ObjectData.class);
 
     /** The name of the actor that processes event that initializes the object builder */
-    public static final String PROCESS_ROOT_START = "processRootStart";
+    static final String PROCESS_ROOT_START = "processRootStart";
 
     /** The name of the actor that processes the event indicating the object buildin is complete */
-    public static final String PROCESS_DONE = "processDone";
+    static final String PROCESS_DONE = "processDone";
 
     /** The name of the actor that processes the start of a named entity, either an object or field */
-    public static final String PROCESS_ENTITY_START = "processEntityStart";
+    static final String PROCESS_ENTITY_START = "processEntityStart";
 
     /** The name of the actor that processes the start of the nested named entity */
-    public static final String PROCESS_NESTED_ENTITY_START = "processNestedEntityStart";
+    static final String PROCESS_NESTED_ENTITY_START = "processNestedEntityStart";
 
     /** The name of the actor that processes the event that sets a field value on an object */
-    public static final String PROCESS_SIMPLE_VALUE = "processSimpleValue";
+    static final String PROCESS_SIMPLE_VALUE = "processSimpleValue";
 
     /** The name of the actor that processes the event that triggers the building of an object from collected fields */
-    public static final String PROCESS_OBJECT_DONE = "processObjectDone";
+    static final String PROCESS_OBJECT_DONE = "processObjectDone";
 
     /** The object that consumes the result processed by the state table when a root object is built */
     private final Consumer<T> resultConsumer;
@@ -49,7 +49,7 @@ public class ObjectData<T> extends AbstractStateTableData {
 
     private String itemName;
 
-    public ObjectData(@NotNull final Class<T> objectClass, @NotNull final Consumer<T> resultConsumer) {
+    ObjectData(@NotNull final Class<T> objectClass, @NotNull final Consumer<T> resultConsumer) {
         super(ObjectStates.AWAITING_ROOT_START.name(), ObjectStates.AWAITING_ROOT_START.name());
         this.objectClass = checkNotNull(objectClass, "objectClass must not be null");
         this.resultConsumer = checkNotNull(resultConsumer, "resultConsumer must not be null");
@@ -117,7 +117,7 @@ public class ObjectData<T> extends AbstractStateTableData {
     }
 
     /** Returns <code>true</code> when the state table is currently building a list */
-    public boolean isBuildingList() {
+    boolean isBuildingList() {
         final BaseBuilder objectBuilder = objectBuilderStack.peek();
         final BaseBuilder.BuilderType fieldType = (null == objectBuilder) ? null : objectBuilder.getType();
         return BaseBuilder.BuilderType.LIST_BUILDER.equals(fieldType);

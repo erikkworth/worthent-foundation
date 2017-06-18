@@ -13,19 +13,24 @@ import static com.worthent.foundation.util.condition.Preconditions.checkNotNull;
  */
 public class ObjectConstructionEvent implements StateEvent {
 
-    public static final String EVENT_ROOT_START = "RootStart";
+    static final String EVENT_ROOT_START = "RootStart";
 
-    public static final String EVENT_DONE = "Done";
+    static final String EVENT_DONE = "Done";
 
-    public static final String EVENT_ENTITY_START = "EntityStart";
+    static final String EVENT_ENTITY_START = "EntityStart";
 
-    public static final String EVENT_OBJECT_START = "ObjectStart";
+    static final String EVENT_SIMPLE_VALUE = "SimpleValue";
 
-    public static final String EVENT_LIST_START = "ListStart";
+    static final String EVENT_OBJECT_DONE = "ObjectDone";
 
-    public static final String EVENT_SIMPLE_VALUE = "SimpleValue";
+    private static final ObjectConstructionEvent ROOT_START_EVENT =
+            new ObjectConstructionEvent(EVENT_ROOT_START, PayloadType.NONE, null);
 
-    public static final String EVENT_OBJECT_DONE = "ObjectDone";
+    private static final ObjectConstructionEvent DONE_EVENT =
+            new ObjectConstructionEvent(EVENT_DONE, PayloadType.NONE, null);
+
+    private static final ObjectConstructionEvent OBJECT_DONE_EVENT =
+            new ObjectConstructionEvent(EVENT_OBJECT_DONE, PayloadType.NONE, null);
 
     enum PayloadType {
         NONE,
@@ -33,27 +38,17 @@ public class ObjectConstructionEvent implements StateEvent {
         VALUE;
     }
 
-    public static ObjectConstructionEvent newRootStartEvent() {
-        return new ObjectConstructionEvent(EVENT_ROOT_START, PayloadType.NONE, null);
+    public static ObjectConstructionEvent getRootStartEvent() {
+        return ROOT_START_EVENT;
     }
 
-    public static ObjectConstructionEvent newDoneEvent() {
-        return new ObjectConstructionEvent(EVENT_DONE, PayloadType.NONE, null);
+    public static ObjectConstructionEvent getDoneEvent() {
+        return DONE_EVENT;
     }
 
     public static ObjectConstructionEvent newEntityStartEvent(@NotNull final String entityName) {
         checkNotNull(entityName, "entityName must not be null");
         return new ObjectConstructionEvent(EVENT_ENTITY_START, PayloadType.ENTITY_NAME, entityName);
-    }
-
-    public static ObjectConstructionEvent newObjectStartEvent(@NotNull final String entityName) {
-        checkNotNull(entityName, "entityName must not be null");
-        return new ObjectConstructionEvent(EVENT_OBJECT_START, PayloadType.ENTITY_NAME, entityName);
-    }
-
-    public static ObjectConstructionEvent newListStartEvent(@NotNull final String entityName) {
-        checkNotNull(entityName, "entityName must not be null");
-        return new ObjectConstructionEvent(EVENT_LIST_START, PayloadType.ENTITY_NAME, entityName);
     }
 
     public static ObjectConstructionEvent newSimpleValueEvent(@NotNull final Object simpleValue) {
@@ -62,7 +57,7 @@ public class ObjectConstructionEvent implements StateEvent {
     }
 
     public static ObjectConstructionEvent newObjectDoneEvent() {
-        return new ObjectConstructionEvent(EVENT_OBJECT_DONE, PayloadType.NONE, null);
+        return OBJECT_DONE_EVENT;
     }
 
     /** The type of event */

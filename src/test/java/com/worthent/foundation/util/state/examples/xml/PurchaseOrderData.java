@@ -1,17 +1,14 @@
 package com.worthent.foundation.util.state.examples.xml;
 
-import com.worthent.foundation.util.state.AbstractStateTableData;
 import com.worthent.foundation.util.state.etc.obj.ObjectConstructor;
 import com.worthent.foundation.util.state.etc.obj.ObjectField;
-import com.worthent.foundation.util.state.etc.xml.XmlData;
 
-import java.util.LinkedList;
 import java.util.List;
 
 /**
  * State Table Data Object representing a purchase order parsed from an XML document.
  */
-public class PurchaseOrderData extends AbstractStateTableData {
+public class PurchaseOrderData {
 
     /** The number of milliseconds from epoch (1/1/1907 00:00:00) when the order was placed */
     private final long purchaseTimestamp;

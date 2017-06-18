@@ -10,7 +10,7 @@
             <Price>50.25</Price>
             <Currency>USD</Currency>
         </PurchaseItemData>
-        <PurchaseItemData itemNumber="1">
+        <PurchaseItemData itemNumber="2">
             <Sku>YXY-555</Sku>
             <Quantity>2</Quantity>
             <Price>70.00</Price>

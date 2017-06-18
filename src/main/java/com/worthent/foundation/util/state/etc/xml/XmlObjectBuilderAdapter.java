@@ -4,6 +4,7 @@
 package com.worthent.foundation.util.state.etc.xml;
 
 import com.worthent.foundation.util.annotation.NotNull;
+import com.worthent.foundation.util.state.StateErrorHandler;
 import com.worthent.foundation.util.state.StateExeException;
 import com.worthent.foundation.util.state.StateTable;
 import com.worthent.foundation.util.state.StateTableControl;
@@ -39,6 +40,7 @@ public class XmlObjectBuilderAdapter implements StateTableControl<XmlEvent> {
      */
     public XmlObjectBuilderAdapter(@NotNull final StateTableControl<ObjectConstructionEvent> stateTableControl) {
         this.xmlData = new XmlData(checkNotNull(stateTableControl, "stateTableControl must not be null"));
+        final StateErrorHandler<XmlData, XmlEvent> stateErrorHandler = new XmlStateErrorHandler();
         final StateTable<XmlData, XmlEvent> objectConstructionStateTable = new StateTableBuilderImpl<XmlData, XmlEvent>()
                 .withStateTableDefinition()
                 .setName("XMLObjectBuilderAdapter")
@@ -101,6 +103,7 @@ public class XmlObjectBuilderAdapter implements StateTableControl<XmlEvent> {
                     .endState()
                 .endDefinition()
                 .withStateTableDataManager().withDataGetter((e) -> xmlData).endDataManager()
+                .withErrorHandler(stateErrorHandler)
                 .build();
         this.stateTableControl = new SerialStateTableControl<>(objectConstructionStateTable);
     }

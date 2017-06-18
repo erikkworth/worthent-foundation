@@ -31,6 +31,9 @@ public class ObjectBuilder extends BaseBuilder {
     public BaseBuilder getFieldBuilder(@NotNull final String name) {
         final String itemName = checkNotNull(name, "name must not be null").toLowerCase();
         final ConstructorParameter parameter = constructionWorker.getConstructorParameter(itemName);
+        if (null == parameter) {
+            return null;
+        }
         if (parameter.isCollectionType()) {
             return new ListBuilder(itemName, parameter);
         } else {

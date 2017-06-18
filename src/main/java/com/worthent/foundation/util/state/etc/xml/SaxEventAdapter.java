@@ -25,22 +25,22 @@ import static com.worthent.foundation.util.condition.Preconditions.checkNotNull;
 public class SaxEventAdapter extends DefaultHandler {
 
     /** Event name for the Start Document notification */
-    public static final String START_DOCUMENT = "StartDocument";
+    static final String START_DOCUMENT = "StartDocument";
 
     /** Event name for the End Document notification */
-    public static final String END_DOCUMENT = "EndDocument";
+    static final String END_DOCUMENT = "EndDocument";
 
     /** Event name for the Start Element notification */
-    public static final String START_ELEMENT = "StartElement";
+    static final String START_ELEMENT = "StartElement";
 
     /** Event name for the End Element notification */
-    public static final String END_ELEMENT = "EndElement";
+    static final String END_ELEMENT = "EndElement";
 
     /** Event name for the character data notification */
-    public static final String CHARACTER_DATA = "CharacterData";
+    static final String CHARACTER_DATA = "CharacterData";
 
     /** Event name for the whitespace notification */
-    public static final String WHITESPACE = "Whitespace";
+    static final String WHITESPACE = "Whitespace";
 
     /** SAX Start Document event (stateless) */
     private static final XmlEvent START_DOCUMENT_EVENT = new XmlEvent(START_DOCUMENT);
@@ -68,7 +68,7 @@ public class SaxEventAdapter extends DefaultHandler {
      * or whitespace and returns the trimmed character data. In the case of
      * whitespace,it returns an empty string.
      */
-    public static String assertCharacterData(final XmlEvent event)
+    static String assertCharacterData(final XmlEvent event)
             throws StateExeException {
         if (event instanceof CharacterDataEvent) {
             final CharacterDataEvent charDataEvent = (CharacterDataEvent) event;

@@ -35,6 +35,8 @@ public class EndElementEvent extends XmlEvent {
      * Returns the element namespace URI. The Namespace URI is required when
      * the namespaces property on the parser is set to true (the default),
      * and is optional when the namespaces property is false.
+     *
+     * @return the element namespace URI
      */
     public final String getNamespaceURI() {
         return namespaceURI;
@@ -44,6 +46,8 @@ public class EndElementEvent extends XmlEvent {
      * Returns the element local name. The local name is required when the
      * namespaces property on the parser is set to true (the default), and
      * is optional when the namespaces property is false.
+     *
+     * @return the element local name
      */
     public final String getLocalName() {
         return localName;
@@ -53,6 +57,8 @@ public class EndElementEvent extends XmlEvent {
      * Returns the element qualified name (prefixed). the qualified name is
      * required when the namespace-prefixes property is true, and is
      * optional when the namespace-prefixes property is false (the default).
+     *
+     * @return the element qualified name
      */
     public final String getQualifiedName() {
         return qName;
@@ -73,14 +79,28 @@ public class EndElementEvent extends XmlEvent {
         super(EVENT_NAME);
     }
 
+    /**
+     * Sets the namespace URI.
+     *
+     * @param namespaceURI the namespace URI
+     */
     void setNamespaceURI(final String namespaceURI) {
         this.namespaceURI = namespaceURI;
     }
 
+    /**
+     * Sets the local name
+     * @param localName the local name
+     */
     void setLocalName(final String localName) {
         this.localName = localName;
     }
 
+    /**
+     * Sets teh qualified name.
+     *
+     * @param qName the qualified name
+     */
     void setQName(final String qName) {
         this.qName = qName;
     }

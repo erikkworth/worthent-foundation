@@ -1,18 +1,18 @@
-/**
- * Copyright 2000-2011 Worth Enterprises, Inc.  All rights reserved.
- */
 package com.worthent.foundation.util.state.provider;
 
 import java.util.LinkedList;
 
+import com.worthent.foundation.util.annotation.NotNull;
 import com.worthent.foundation.util.state.*;
 import com.worthent.foundation.util.state.impl.StateEngine;
+
+import static com.worthent.foundation.util.condition.Preconditions.checkNotNull;
 
 /**
  * Implements the {@link StateTableControl} interface to provide a serial
  * (non-concurrent) implementation of the state table. The state table
  * transition actions are all conducted on the same thread as the client and the
- * call to the {@link #signalEvent} method blocks until the event has been
+ * call to the {@link #signalEvent} method does not return until the event has been
  * processed.
  * 
  * @author Erik K. Worth
@@ -21,10 +21,10 @@ import com.worthent.foundation.util.state.impl.StateEngine;
 public class SerialStateTableControl<D extends StateTableData, E extends StateEvent> implements StateTableControl<E> {
 
     /** The state table engine that processes events */
-    private final StateEngine engine;
+    private final StateEngine<D, E> engine;
 
     /** The state table instance */
-    protected final StateTable<D, E> stateTblInstance;
+    private final StateTable<D, E> stateTblInstance;
 
     /** Event queue */
     private final LinkedList<E> queue;
@@ -37,7 +37,7 @@ public class SerialStateTableControl<D extends StateTableData, E extends StateEv
     public SerialStateTableControl(final StateTable<D, E> stateTblInstance) {
         this.stateTblInstance = stateTblInstance;
         queue = new LinkedList<>();
-        engine = new StateEngine();
+        engine = new StateEngine<>();
     }
 
     /**
@@ -50,8 +50,8 @@ public class SerialStateTableControl<D extends StateTableData, E extends StateEv
      *            event
      * 
      */
-    public void queueEvent(final E event) {
-
+    public void queueEvent(@NotNull final E event) {
+        checkNotNull(event, "event must not be null");
         // Put this new event into the end of the queue
         queue.addLast(event);
     }
@@ -65,12 +65,11 @@ public class SerialStateTableControl<D extends StateTableData, E extends StateEv
      * 
      * @param event the event to trigger activity in the state table
      * 
-     * @exception StateExeException thrown when there is an error processing the
-     *            event
+     * @exception StateExeException thrown when there is an error processing the event
      */
     @Override
-    public void signalEvent(final E event) throws StateExeException {
-
+    public void signalEvent(@NotNull final E event) throws StateExeException {
+        checkNotNull(event, "event must not be null");
         // Put this new event into the end of the queue
         queue.addLast(event);
 
@@ -78,7 +77,7 @@ public class SerialStateTableControl<D extends StateTableData, E extends StateEv
         // more. Note that the queue is required because the code that
         // processes an event can submit new events back into the table.
         while (!queue.isEmpty()) {
-            final StateEvent nextEvent = queue.removeFirst();
+            final E nextEvent = queue.removeFirst();
             engine.processEvent(stateTblInstance, this, nextEvent);
         }
     }

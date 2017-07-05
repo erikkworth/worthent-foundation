@@ -84,7 +84,11 @@ public class SaxEventAdapter extends DefaultHandler {
         }
     }
 
-    /** Construct with the state table control for the state table able to consume the SAX events */
+    /**
+     * Construct with the state table control for the state table able to consume the SAX events
+     *
+     * @param stateTableControl the state table control for the state table able to consume XML Events
+     */
     public SaxEventAdapter(@NotNull final StateTableControl<XmlEvent> stateTableControl) {
         this.stateTableControl = checkNotNull(stateTableControl, "stateTableControl must not be null");
     }

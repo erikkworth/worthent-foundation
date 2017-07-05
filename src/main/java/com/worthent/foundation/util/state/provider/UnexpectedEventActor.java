@@ -4,7 +4,10 @@
 package com.worthent.foundation.util.state.provider;
 
 
+import com.worthent.foundation.util.annotation.NotNull;
 import com.worthent.foundation.util.state.*;
+
+import static com.worthent.foundation.util.condition.Preconditions.checkNotNull;
 
 /**
  * Reusable actor that serves well as the actor within the default transition
@@ -30,8 +33,9 @@ public final class UnexpectedEventActor<D extends StateTableData, E extends Stat
     }
 
     /**
-     * Returns the name of the actor class for logging purposes
+     * @return the name of the actor class for logging purposes
      */
+    @NotNull
     public String getActorName() {
         return getClass().getName();
     }
@@ -40,7 +44,8 @@ public final class UnexpectedEventActor<D extends StateTableData, E extends Stat
      * Throws an exception indicating the specified event was unexpected in the
      * current state.
      */
-    public void onAction(final TransitionContext<D, E> context) throws StateExeException {
+    public void onAction(@NotNull final TransitionContext<D, E> context) throws StateExeException {
+        checkNotNull(context, "context must not be null");
         final StateTable table = context.getStateTable();
         final StateEvent event = context.getEvent();
         throw new StateExeException("The state table, '" +
@@ -52,12 +57,6 @@ public final class UnexpectedEventActor<D extends StateTableData, E extends Stat
                 "'.");
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * com.worthent.foundation.service.spi.util.state.TransitionActor#getName()
-     */
     @Override
     public String getName() {
         return UNEXPECTED_EVENT_ACTOR_NAME;

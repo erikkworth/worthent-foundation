@@ -1,7 +1,6 @@
-/*
- * Copyright 2000-2015 Worth Enterprises, Inc.  All rights reserved.
- */
 package com.worthent.foundation.util.state.def.impl;
+
+import com.worthent.foundation.util.annotation.Nullable;
 
 /**
  * A base class for builders that are a child of some parent builder.
@@ -17,12 +16,21 @@ public abstract class AbstractChildBuilder<P> {
         this(null);
     }
 
-    /** Construct with the parent builder */
-    protected AbstractChildBuilder(final P parentBuilder) {
+    /**
+     * Construct with the parent builder
+     *
+     * @param parentBuilder the builder that creates and returns this builder to build a sub-element structure
+     */
+    protected AbstractChildBuilder(@Nullable final P parentBuilder) {
         this.parentBuilder = parentBuilder;
     }
 
-    /** Returns the parent builder or throws an IllegalStateException if there is not parent builder */
+    /**
+     * Returns the parent builder or throws an IllegalStateException if there is no parent builder
+     *
+     * @return the parent builder
+     * @throws IllegalStateException thrown when there is no parent builder
+     */
     protected P getParentBuilder() {
         if (null == parentBuilder) {
             throw new IllegalStateException("This builder was not created from a parent builder");

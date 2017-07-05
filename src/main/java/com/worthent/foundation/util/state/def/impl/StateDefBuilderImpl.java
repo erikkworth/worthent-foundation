@@ -1,9 +1,7 @@
-/*
- * Copyright 2000-2015 Worth Enterprises, Inc.  All rights reserved.
- */
 package com.worthent.foundation.util.state.def.impl;
 
 import com.worthent.foundation.util.annotation.NotNull;
+import com.worthent.foundation.util.annotation.Nullable;
 import com.worthent.foundation.util.state.StateEvent;
 import com.worthent.foundation.util.state.StateTableData;
 import com.worthent.foundation.util.state.def.StateDefBuilder;
@@ -15,6 +13,9 @@ import com.worthent.foundation.util.state.def.StateTransitionDef;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+
+import static com.worthent.foundation.util.condition.Preconditions.checkNotBlank;
+import static com.worthent.foundation.util.condition.Preconditions.checkNotNull;
 
 /**
  * Implements the builder that defines a state in a state table.
@@ -44,39 +45,32 @@ public class StateDefBuilderImpl<D extends StateTableData, E extends StateEvent>
      * @param stateName the name of this state in the state table
      */
     StateDefBuilderImpl(
-            final StateTableDefBuilder<D, E> parentBuilder,
-            final TransitionActorManager<D, E> transitionActorManager,
-            final String stateName) {
+            @Nullable final StateTableDefBuilder<D, E> parentBuilder,
+            @NotNull final TransitionActorManager<D, E> transitionActorManager,
+            @NotNull final String stateName) {
         super(parentBuilder);
-        if (null == transitionActorManager) {
-            throw new IllegalArgumentException("transitionActorManager must not be null");
-        }
-        if (null == stateName) {
-            throw new IllegalArgumentException("stateName must not be null");
-        }
-        if (stateName.trim().length() == 0) {
-            throw new IllegalArgumentException("stateName must not be blank");
-        }
-        this.transitionActorManager = transitionActorManager;
-        this.stateName = stateName;
+        this.transitionActorManager = checkNotNull(transitionActorManager, "transitionActorManager must not be null");
+        this.stateName = checkNotBlank(stateName, "stateName must not be blank");
         this.transitions = new LinkedList<>();
     }
 
     @Override
-    public StateTransitionDefBuilder<D, E> transitionOnEvent(final String eventName) {
+    @NotNull
+    public StateTransitionDefBuilder<D, E> transitionOnEvent(@NotNull final String eventName) {
+        checkNotBlank(eventName, "eventName must not be blank");
         return new StateTransitionDefBuilderImpl<>(this, transitionActorManager, eventName);
     }
 
     @Override
+    @NotNull
     public StateTransitionDefBuilder<D, E> withDefaultEventHandler() {
         return new StateTransitionDefBuilderImpl<>(this, transitionActorManager, StateTransitionDefImpl.DEFAULT_HANDLER_EVENT_ID);
     }
 
     @Override
-    public StateDefBuilder<D, E> withDefaultEventHandler(final StateTransitionDef<D, E> defaultStateTransition) {
-        if (null == defaultStateTransition) {
-            throw new IllegalArgumentException("stateTransition must not be null");
-        }
+    @NotNull
+    public StateDefBuilder<D, E> withDefaultEventHandler(@NotNull final StateTransitionDef<D, E> defaultStateTransition) {
+        checkNotNull(defaultStateTransition, "defaultStateTransition must not be null");
         if (!StateTransitionDefImpl.DEFAULT_HANDLER_EVENT_ID.equals(defaultStateTransition.getEventName())) {
             throw new IllegalArgumentException(
                     "Expected the default state transition to have the special event name, " +
@@ -87,10 +81,9 @@ public class StateDefBuilderImpl<D extends StateTableData, E extends StateEvent>
     }
 
     @Override
-    public StateDefBuilder<D, E> appendStateTransition(StateTransitionDef<D, E> stateTransition) {
-        if (null == stateTransition) {
-            throw new IllegalArgumentException("stateTransition must not be null");
-        }
+    @NotNull
+    public StateDefBuilder<D, E> appendStateTransition(@NotNull StateTransitionDef<D, E> stateTransition) {
+        checkNotNull(stateTransition, "stateTransition must not be null");
         if (StateTransitionDefImpl.DEFAULT_HANDLER_EVENT_ID.equals(stateTransition.getEventName())) {
             defaultTransition = stateTransition;
         } else {
@@ -100,6 +93,7 @@ public class StateDefBuilderImpl<D extends StateTableData, E extends StateEvent>
     }
 
     @Override
+    @NotNull
     public StateTableDefBuilder<D, E> endState() {
         final StateTableDefBuilder<D, E> parentBuilder = getParentBuilder();
         final StateDef<D, E> state = build();
@@ -108,6 +102,7 @@ public class StateDefBuilderImpl<D extends StateTableData, E extends StateEvent>
     }
 
     @Override
+    @NotNull
     public StateDef<D, E> build() {
         return (defaultTransition == null)
                 ? new StateDefImpl<>(stateName, transitions)
@@ -127,7 +122,8 @@ public class StateDefBuilderImpl<D extends StateTableData, E extends StateEvent>
     }
 
     @Override
-    public StateTransitionDef<D, E> getTransitionForEvent(final String eventName) {
+    @Nullable
+    public StateTransitionDef<D, E> getTransitionForEvent(@NotNull final String eventName) {
         for (StateTransitionDef<D, E> transition : transitions) {
             if (transition.getEventName().equals(eventName)) {
                 return transition;

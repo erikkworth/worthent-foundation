@@ -1,6 +1,3 @@
-/*
- * Copyright 2000-2011 Worth Enterprises, Inc.  All Rights Reserved.
- */
 package com.worthent.foundation.util.state;
 
 /**
@@ -8,7 +5,6 @@ package com.worthent.foundation.util.state;
  * state table.
  * 
  * @author Erik K. Worth
- * @version $Id: StateExeException.java 2 2011-11-28 00:10:06Z erik.k.worth@gmail.com $
  */
 public class StateExeException extends RuntimeException {
     

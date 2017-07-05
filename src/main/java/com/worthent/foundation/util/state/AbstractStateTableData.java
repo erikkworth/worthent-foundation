@@ -3,6 +3,11 @@
  */
 package com.worthent.foundation.util.state;
 
+import com.worthent.foundation.util.annotation.NotNull;
+import com.worthent.foundation.util.annotation.Nullable;
+
+import static com.worthent.foundation.util.condition.Preconditions.checkNotNull;
+
 /**
  * A simple JavaBean holding the current and prior state of a state table
  * instance.
@@ -10,7 +15,6 @@ package com.worthent.foundation.util.state;
  * @see StateTable
  * 
  * @author Erik K. Worth
- * @version $Id: AbstractStateTableData.java 2 2011-11-28 00:10:06Z erik.k.worth@gmail.com $
  */
 public class AbstractStateTableData implements StateTableData {
     
@@ -26,41 +30,75 @@ public class AbstractStateTableData implements StateTableData {
         priorState = null;
     }
 
-    /** Construct from components */
-    public AbstractStateTableData(final String currentState, final String priorState) {
+    /**
+     * Construct from components.
+     *
+     * @param currentState the state of the state table prior to processing an event
+     * @param priorState the state of the state table before processing the previous event
+     */
+    public AbstractStateTableData(@Nullable final String currentState, @Nullable final String priorState) {
         this.currentState = currentState;
         this.priorState = priorState;
     }
 
-    /** Copy constructor */
-    public AbstractStateTableData(final AbstractStateTableData other) {
+    /**
+     * Copy constructor
+     *
+     * @param other the other state table data to copy
+     */
+    public AbstractStateTableData(@NotNull final AbstractStateTableData other) {
+        checkNotNull(other, "other must not be null");
         this.currentState = other.currentState;
         this.priorState = other.priorState;
     }
 
-    /** Sets the history from another instance */
-    public void set(final AbstractStateTableData other) {
+    /**
+     * Sets the history from another instance
+     *
+     * @param other the other instance of the state table data to copy from
+     */
+    public void set(@NotNull final AbstractStateTableData other) {
+        checkNotNull(other, "other must not be null");
         this.currentState = other.currentState;
         this.priorState = other.priorState;
     }
 
-    /** Returns the current state of the state table instance */
+    /**
+     * Returns the current state of the state table instance
+     *
+     * @return the current state of the state table instance
+     */
+    @Nullable
     public final String getCurrentState() {
         return currentState;
     }
 
-    /** Sets the current state of the state table instance */
-    public final void setCurrentState(final String currentState) {
+    /**
+     * Sets the current state of the state table instance
+     *
+     * @param currentState set the current state of the state table typically as the result of a completed transition
+     */
+    public final void setCurrentState(@Nullable final String currentState) {
         this.currentState = currentState;
     }
 
-    /** Returns the prior state of the state table instance */
+    /**
+     * Returns the prior state of the state table instance
+     *
+     * @return the prior state of the state table instance
+     */
+    @Nullable
     public final String getPriorState() {
         return priorState;
     }
 
-    /** Sets the prior state of the state table instance */
-    public final void setPriorState(final String priorState) {
+    /**
+     * Sets the prior state of the state table instance
+     *
+     * @param priorState set the prior state of the state table typically from the previous current state as the result
+     *                   of a completed transition
+     */
+    public final void setPriorState(@Nullable final String priorState) {
         this.priorState = priorState;
     }
 

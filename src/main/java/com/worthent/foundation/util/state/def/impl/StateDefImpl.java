@@ -105,40 +105,24 @@ public class StateDefImpl<D extends StateTableData, E extends StateEvent> implem
         this.defaultTransition = checkNotNull(defaultTransition, "defaultTransition must not be null");
     }
 
-    /**
-     * Returns the identifier for this state.
-     */
     @NotNull
     @Override
     public final String getName() {
         return name;
     }
 
-    /**
-     * Returns the <code>StateTransitionDef</code> that originate from this
-     * state.
-     */
     @NotNull
     @Override
     public final Collection<StateTransitionDef<D, E>> getTransitions() {
         return transitions.values();
     }
 
-    /**
-     * Returns the <code>StateTransitionDef</code> that handles the transition
-     * for the specified event name or <code>null</code> if no transition is
-     * configured for the specified event name.
-     */
     @Nullable
     @Override
-    public final StateTransitionDef<D, E> getTransitionForEvent(final String eventName) {
+    public final StateTransitionDef<D, E> getTransitionForEvent(@NotNull final String eventName) {
         return transitions.get(eventName);
     }
 
-    /**
-     * Returns the last state transition defined as the default or
-     * <code>null</code> if no transitions have been defined.
-     */
     @NotNull
     @Override
     public StateTransitionDef<D, E> getDefaultTransition() {

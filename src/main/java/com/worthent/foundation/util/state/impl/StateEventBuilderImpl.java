@@ -1,13 +1,15 @@
-/**
- * Copyright 2000-2015 Worth Enterprises, Inc.  All rights reserved.
- */
 package com.worthent.foundation.util.state.impl;
 
+import com.worthent.foundation.util.annotation.NotNull;
+import com.worthent.foundation.util.annotation.Nullable;
 import com.worthent.foundation.util.state.StateEvent;
 import com.worthent.foundation.util.state.StateEventBuilder;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.worthent.foundation.util.condition.Preconditions.checkNotBlank;
+import static com.worthent.foundation.util.condition.Preconditions.checkNotNull;
 
 /**
  * Implements the builder interface for state events.
@@ -20,14 +22,13 @@ public class StateEventBuilderImpl implements StateEventBuilder {
     /** The event data values */
     private final Map<String, Object> eventData;
 
-    /** Construct with the event name */
-    public StateEventBuilderImpl(final String eventName) {
-        if (null == eventName) {
-            throw new IllegalArgumentException("eventName must not be null");
-        }
-        if (eventName.trim().length() == 0) {
-            throw new IllegalArgumentException("eventName must not be blank");
-        }
+    /**
+     * Construct with the event name
+     *
+     * @param eventName the identifier for the event
+     */
+    public StateEventBuilderImpl(@NotNull final String eventName) {
+        checkNotBlank(eventName, "eventName must not be blank");
         this.eventName = eventName;
         this.eventData = new HashMap<>();
     }
@@ -38,23 +39,28 @@ public class StateEventBuilderImpl implements StateEventBuilder {
     }
 
     @Override
-    @SuppressWarnings("Unchecked")
-    public <T> T getEventData(final String key) {
+    @SuppressWarnings("unchecked")
+    @Nullable
+    public <T> T getEventData(@Nullable final String key) {
         return (T) eventData.get(key);
     }
 
     @Override
+    @NotNull
     public Map<String, Object> getEventData() {
         return eventData;
     }
 
     @Override
-    public StateEventBuilder withEventData(final String name, final Object value) {
+    @NotNull
+    public StateEventBuilder withEventData(@NotNull final String name, @Nullable final Object value) {
+        checkNotNull(name, "name must not be null");
         eventData.put(name, value);
         return this;
     }
 
     @Override
+    @NotNull
     public StateEvent build() {
         return new StateEventWithDataMapImpl(eventName, eventData);
     }

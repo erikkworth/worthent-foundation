@@ -51,7 +51,11 @@ public class StateTableDefBuilderImpl<D extends StateTableData, E extends StateE
         this(null, null);
     }
 
-    /** Construct with the provided parent builder and its own transition actor manager */
+    /**
+     * Construct with the provided parent builder and its own transition actor manager
+     *
+     * @param parentBuilder the state table builder that created this builder
+     */
     public StateTableDefBuilderImpl(@Nullable final StateTableBuilder<D, E> parentBuilder) {
         this(parentBuilder, null);
     }

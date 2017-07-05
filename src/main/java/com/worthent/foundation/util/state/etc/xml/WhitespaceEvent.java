@@ -23,7 +23,7 @@ public class WhitespaceEvent extends XmlEvent {
         return EVENT_NAME;
     }
 
-    /** Returns the character data */
+    /** @return the character data */
     public final String getCharacterData() {
         return charData;
     }
@@ -43,6 +43,10 @@ public class WhitespaceEvent extends XmlEvent {
         super(EVENT_NAME);
     }
 
+    /**
+     * Sets the white space characters
+     * @param charData the white space characters
+     */
     void setCharacterData(final String charData) {
         this.charData = charData;
     }

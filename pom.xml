@@ -9,9 +9,44 @@
   <version>1.0.0</version>
   <packaging>jar</packaging>
   <name>worthent-foundation</name>
+  <inceptionYear>2000</inceptionYear>
   <description>
     Core utilities for the Worth Enterprises suite of software components.
   </description>
+  <url>https://github.com/erikkworth/worthent-foundation</url>
+
+  <licenses>
+    <license>
+      <name>Eclipse Public License 1.0</name>
+      <url>https://www.eclipse.org/legal/epl-v10.html</url>
+      <distribution>repo</distribution>
+      <comments>
+        This commercially-friendly copyleft license provides the ability to commercially license binaries;
+        a modern royalty-free patent license grant; and the ability for linked works to use other licenses,
+        including commercial ones.
+      </comments>
+    </license>
+  </licenses>
+
+  <organization>
+    <name>Worth Enterprises, Inc</name>
+    <url>http://www.worthent.com</url>
+  </organization>
+
+  <developers>
+    <developer>
+      <name>Erik K. Worth</name>
+      <email>erik@worthent.com</email>
+      <organization>Worth Enterprises, Inc.</organization>
+      <organizationUrl>http://www.worthent.com</organizationUrl>
+    </developer>
+  </developers>
+
+  <scm>
+    <connection>scm:git:git://github.com/erikkworth/worthent-foundation.git</connection>
+    <developerConnection>scm:git:ssh://github.com:erikkworth/worthent-foundation.git</developerConnection>
+    <url>https://github.com/erikkworth/worthent-foundation</url>
+  </scm>
 
   <properties>
   <!-- The version of the Logging Facade open source product -->
@@ -149,6 +184,16 @@
             </archive>
           </configuration>
         </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-source-plugin</artifactId>
+          <version>3.0.1</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <version>2.10.4</version>
+        </plugin>
       </plugins>
     </pluginManagement>
     <resources>
@@ -172,6 +217,30 @@
           <execution>
             <goals>
               <goal>test-jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>attach-javadocs</id>
+            <goals>
+              <goal>jar</goal>
             </goals>
           </execution>
         </executions>

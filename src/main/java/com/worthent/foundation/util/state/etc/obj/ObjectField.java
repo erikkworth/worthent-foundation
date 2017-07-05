@@ -17,8 +17,9 @@ import static com.worthent.foundation.util.state.etc.obj.ConstructorParameter.*;
 @Target(ElementType.PARAMETER)
 public @interface ObjectField {
 
-    /** The name of the field */
+    /** @return the name of the field */
     String value();
 
+    /** @return the element type or the default void.class when not a list field */
     Class<?> elementType() default void.class;
 }

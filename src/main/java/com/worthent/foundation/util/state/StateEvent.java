@@ -9,6 +9,11 @@ package com.worthent.foundation.util.state;
  * @author Erik K. Worth
  */
 public interface StateEvent {
-    /** Returns the string identifier for this event */
+
+    /** Returns the string identifier for this event
+     *
+     * @return the string identifier for this event
+     */
     String getName();
-} // StateEvent
+
+}

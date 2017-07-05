@@ -3,6 +3,8 @@
  */
 package com.worthent.foundation.util.state;
 
+import com.worthent.foundation.util.annotation.NotNull;
+import com.worthent.foundation.util.annotation.Nullable;
 import com.worthent.foundation.util.state.data.StateTableDataManager;
 import com.worthent.foundation.util.state.def.StateTableDef;
 
@@ -21,24 +23,44 @@ import com.worthent.foundation.util.state.def.StateTableDef;
  * @version $Id: StateTable.java 2 2011-11-28 00:10:06Z erik.k.worth@gmail.com $
  */
 public interface StateTable<D extends StateTableData, E extends StateEvent> {
-    /** Returns the name of the state table */
+
+    /**
+     * Returns the name of the state table or <code>null</code> if none was specified
+     *
+     * @return the name of the state table or <code>null</code> if none was specified
+     */
+    @Nullable
     String getStateTableName();
 
     /**
-     * Returns the object that responds to each state transition or
-     * <code>null</code> if none was registered.
+     * Returns the object that responds to each state transition or <code>null</code> if none was registered.
+     *
+     * @return the object that responds to each state transition or <code>null</code> if none was registered
      */
+    @Nullable
     StateTransitioner<D, E> getTransitioner();
 
     /**
-     * Returns the registered handler that responds to state transition errors
-     * or <code>null</code> if none is registered.
+     * Returns the registered handler that responds to state transition errors or <code>null</code> if none is registered.
+     *
+     * @return the registered handler that responds to state transition errors or <code>null</code> if none is registered
      */
+    @Nullable
     StateErrorHandler<D, E> getErrorHandler();
 
-    /** Returns the state table metadata */
-    StateTableDef<D, E> getStateTableDefinition(E event) throws StateExeException;
+    /**
+     * Returns the state table metadata
+     *
+     * @return the data structure that defines the state table
+     */
+    @NotNull
+    StateTableDef<D, E> getStateTableDefinition();
 
-    /** Returns the manager for state table data */
+    /**
+     * Returns the manager for state table data
+     *
+     * @return the manager for state table data
+     */
+    @NotNull
     StateTableDataManager<D, E> getStateTableDataManager();
 }

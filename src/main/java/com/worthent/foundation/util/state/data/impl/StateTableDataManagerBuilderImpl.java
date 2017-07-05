@@ -3,11 +3,13 @@
  */
 package com.worthent.foundation.util.state.data.impl;
 
+import com.worthent.foundation.util.annotation.NotNull;
 import com.worthent.foundation.util.state.StateEvent;
 import com.worthent.foundation.util.state.StateTableBuilder;
 import com.worthent.foundation.util.state.StateTableData;
 import com.worthent.foundation.util.state.data.StateTableDataManager;
 import com.worthent.foundation.util.state.data.StateTableDataManagerBuilder;
+import com.worthent.foundation.util.state.def.StateDefException;
 import com.worthent.foundation.util.state.def.impl.AbstractChildBuilder;
 
 import java.util.function.BiConsumer;
@@ -37,25 +39,25 @@ public class StateTableDataManagerBuilderImpl<D extends StateTableData, E extend
     }
 
     @Override
-    public StateTableDataManagerBuilder<D, E> withInitializer(Runnable dataInitializer) {
+    public StateTableDataManagerBuilder<D, E> withInitializer(@NotNull Runnable dataInitializer) {
         this.dataInitializer = dataInitializer;
         return this;
     }
 
     @Override
-    public StateTableDataManagerBuilder<D, E> withDataGetter(Function<E, D> dataGetterFunction) {
+    public StateTableDataManagerBuilder<D, E> withDataGetter(@NotNull Function<E, D> dataGetterFunction) {
         this.dataGetterFunction = dataGetterFunction;
         return this;
     }
 
     @Override
-    public StateTableDataManagerBuilder<D, E> withDataSetter(BiConsumer<E, D> dataSetterConsumer) {
+    public StateTableDataManagerBuilder<D, E> withDataSetter(@NotNull BiConsumer<E, D> dataSetterConsumer) {
         this.dataSetterConsumer = dataSetterConsumer;
         return this;
     }
 
     @Override
-    public StateTableBuilder<D, E> endDataManager() {
+    public StateTableBuilder<D, E> endDataManager() throws StateDefException {
         final StateTableBuilder<D, E> parentBuilder = getParentBuilder();
         final StateTableDataManager<D, E> stateTableDataManager = build();
         parentBuilder.withStateTableDataManager(stateTableDataManager);
@@ -63,7 +65,10 @@ public class StateTableDataManagerBuilderImpl<D extends StateTableData, E extend
     }
 
     @Override
-    public StateTableDataManager<D, E> build() {
+    public StateTableDataManager<D, E> build() throws StateDefException {
+        if (null == dataGetterFunction) {
+            throw new StateDefException("Missing the Data Getter Function");
+        }
         return new StateTableDataManagerImpl<D, E>(dataInitializer, dataGetterFunction, dataSetterConsumer);
     }
 }

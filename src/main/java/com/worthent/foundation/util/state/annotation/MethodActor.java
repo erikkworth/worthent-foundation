@@ -1,6 +1,3 @@
-/**
- * Copyright 2000-2011 Worth Enterprises, Inc. All rights reserved.
- */
 package com.worthent.foundation.util.state.annotation;
 
 import java.lang.reflect.Method;
@@ -16,7 +13,6 @@ import static com.worthent.foundation.util.condition.Preconditions.checkNotNull;
  * data object.
  *
  * @author Erik K. Worth
- * @version $Id: MethodActor.java 2 2011-11-28 00:10:06Z erik.k.worth@gmail.com $
  */
 public class MethodActor<D extends StateTableData, E extends StateEvent> implements TransitionActor<D, E> {
 
@@ -26,7 +22,7 @@ public class MethodActor<D extends StateTableData, E extends StateEvent> impleme
         /** The actor method takes the event as the argument */
         EVENT,
         /** The actor method takes the full transition context as the argument */
-        CONTEXT;
+        CONTEXT
     }
 
     private final ArgumentType argumentType;
@@ -56,8 +52,8 @@ public class MethodActor<D extends StateTableData, E extends StateEvent> impleme
             @NotNull  final String name) {
         this.argumentType = checkNotNull(argumentType, "argumentType must not be null");
         this.actorClass = actorClass;
-        this.actorMethod = actorMethod;
-        this.name = name;
+        this.actorMethod = checkNotNull(actorMethod, "actorMethod must not be null");
+        this.name = checkNotNull(name, "name must not be null");
     }
 
     /**
@@ -75,18 +71,15 @@ public class MethodActor<D extends StateTableData, E extends StateEvent> impleme
         this(argumentType, null, actorMethod, name);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.worthent.foundation.core.util.state.TransitionActor#getName()
-     */
     @Override
+    @NotNull
     public String getName() {
         return name;
     }
 
     @Override
-    public void onAction(final TransitionContext<D, E> context) throws StateExeException {
+    public void onAction(@NotNull final TransitionContext<D, E> context) throws StateExeException {
+        checkNotNull(context, "context must not be null");
         final Object data = (null == actorClass) ? null : context.getStateTableData();
         final Object arg;
         switch (argumentType) {

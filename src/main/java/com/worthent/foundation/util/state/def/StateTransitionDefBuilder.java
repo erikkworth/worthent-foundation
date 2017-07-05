@@ -15,31 +15,60 @@ import com.worthent.foundation.util.state.TransitionActor;
  */
 public interface StateTransitionDefBuilder<D extends StateTableData, E extends StateEvent> extends StateTransitionDef<D, E> {
 
-    /** Transition to this state for the provided event (required) */
+    /**
+     * Transition to this state for the provided event
+     *
+     * @param targetStateName the target state of the state transition
+     * @return a reference to this builder
+     */
     @NotNull
     StateTransitionDefBuilder<D, E> toState(@NotNull String targetStateName);
 
-    /** Transition to the state when the corresponding condition is satisfied (after processing the event) */
+    /**
+     * Transition to the state when the corresponding condition is satisfied (after processing the event)
+     *
+     * @param goToState the target state based on the first condition built by the returned builder
+     * @return a reference to transition condition builder
+     */
     @NotNull
     ToStateConditionBuilder<D, E> toStateConditionally(@NotNull String goToState);
 
-    /** Transition to the state when the corresponding condition is satisfied (before processing the event) */
-    ToStateConditionBuilder<D, E> toStateConditionallyBeforeEvent(String goToState);
+    /**
+     * Transition to the state when the corresponding condition is satisfied (before processing the event)
+     *
+     * @param goToState the target state based on the first condition built by the returned builder
+     * @return a reference to the transition condition builder
+     */
+    ToStateConditionBuilder<D, E> toStateConditionallyBeforeEvent(@NotNull String goToState);
 
-    /** Have this actor perform its function in the order added during the state transition */
+    /**
+     * Have this actor perform its function in the order added during the state transition
+     *
+     * @param actor the transition actor to invoke when the state table makes the transition being built
+     * @return a reference to this builder
+     */
     @NotNull
     StateTransitionDefBuilder<D, E> withActor(@NotNull TransitionActor<D, E> actor);
 
-    /** Have the actors with these names perform their function in order during the state transition */
+    /**
+     * Have the actors with these names perform their function in order during the state transition
+     *
+     * @param actorNames the names of actors that have been registered with the state table by name
+     * @return a reference to this builder
+     */
     @NotNull
     StateTransitionDefBuilder<D, E> withActorsByName(@NotNull String... actorNames);
 
-    /** Builds the transition, appends it to the state builder that called this builder, and returns the state builder */
+    /**
+     * Builds the transition, appends it to the state builder that called this builder, and returns the state builder
+     *
+     * @return a reference to parent of this builder
+     */
     @NotNull
     StateDefBuilder<D, E> endTransition();
 
     /**
-     * Returns a completed state transition definition or throws an exception if one of the arguments is missing.
+     * @return a completed state transition definition or throws an exception if one of the arguments is missing.
      */
     @NotNull
     StateTransitionDef<D, E> build();

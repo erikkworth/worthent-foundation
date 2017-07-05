@@ -1,7 +1,6 @@
-/*
- * Copyright 2000-2011 Worth Enterprises, Inc.  All Rights Reserved.
- */
 package com.worthent.foundation.util.state;
+
+import com.worthent.foundation.util.annotation.NotNull;
 
 /**
  * Specifies the methods used to signal event to a state table, start and stop
@@ -31,9 +30,10 @@ public interface StateTableControl<E extends StateEvent> {
     /**
      * Signals an event to the state transition engine. The event is queued for
      * the state engine. Events are processed in the order they are received.
-     * 
-     * @throws StateExeException thrown when there is an error signalling an
-     *         event
+     *
+     * @param event the event to submit to the state table
+     *
+     * @throws StateExeException thrown when there is an error signalling an event
      */
-    void signalEvent(E event) throws StateExeException;
+    void signalEvent(@NotNull E event) throws StateExeException;
 }

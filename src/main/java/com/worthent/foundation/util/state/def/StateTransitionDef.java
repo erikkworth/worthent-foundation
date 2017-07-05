@@ -1,6 +1,3 @@
-/*
- * Copyright 2000-2015 Worth Enterprises, Inc.  All Rights Reserved.
- */
 package com.worthent.foundation.util.state.def;
 
 import com.worthent.foundation.util.state.StateEvent;
@@ -21,19 +18,17 @@ public interface StateTransitionDef<D extends StateTableData, E extends StateEve
     String DEFAULT_HANDLER_EVENT_ID = "#Default#";
 
     /**
-     * Returns the event identifier associated with this transition.
+     * @return the event identifier associated with this transition.
      */
     String getEventName();
 
     /**
-     * Returns the identifier for the target state when the transition
-     * completes.
+     * @return the identifier for the target state when the transition completes.
      */
     String getTargetStateName();
 
     /**
-     * Returns the string identifiers for the actions to be taken on this
-     * transition in the order they are executed for a given event.
+     * @return the ordered list of components able to perform actions on this transition for a given event.
      */
     List<TransitionActor<D, E>> getActors();
 }

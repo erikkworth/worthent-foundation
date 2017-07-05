@@ -1,8 +1,6 @@
-/*
- * Copyright 2000-2011 Worth Enterprises, Inc.  All Rights Reserved.
- */
 package com.worthent.foundation.util.state.def.impl;
 
+import com.worthent.foundation.util.annotation.NotNull;
 import com.worthent.foundation.util.state.StateEvent;
 import com.worthent.foundation.util.state.StateTableData;
 import com.worthent.foundation.util.state.TransitionActor;
@@ -10,6 +8,8 @@ import com.worthent.foundation.util.state.def.StateTransitionDef;
 
 import java.util.Collections;
 import java.util.List;
+
+import static com.worthent.foundation.util.condition.Preconditions.checkNotNull;
 
 /**
  * Immutably encapsulates the information for a state transition definition.
@@ -44,21 +44,12 @@ public class StateTransitionDefImpl<D extends StateTableData, E extends StateEve
      * @param actors the actions to take when the transition occurs
      */
     public StateTransitionDefImpl(
-            final String onEvent,
-            final String goToState,
-            final List<TransitionActor<D, E>> actors) {
-        if (null == onEvent) {
-            throw new IllegalArgumentException("onEvent must not be null");
-        }
-        if (null == goToState) {
-            throw new IllegalArgumentException("goToState must not be null");
-        }
-        if (null == actors) {
-            throw new IllegalArgumentException("actors must not be null");
-        }
-        this.onEvent = onEvent;
-        this.goToState = goToState;
-        this.actors = Collections.unmodifiableList(actors);
+            @NotNull final String onEvent,
+            @NotNull final String goToState,
+            @NotNull final List<TransitionActor<D, E>> actors) {
+        this.onEvent = checkNotNull(onEvent, "onEvent must not be null");
+        this.goToState = checkNotNull(goToState, "goToState must not be null");
+        this.actors = Collections.unmodifiableList(checkNotNull(actors, "actors must not be null"));
     }
 
     /**
@@ -71,10 +62,10 @@ public class StateTransitionDefImpl<D extends StateTableData, E extends StateEve
      * @param actor the action to take when the transition occurs
      */
     public StateTransitionDefImpl(
-            final String onEvent,
-            final String goToState,
-            final TransitionActor<D, E> actor) {
-        this(onEvent, goToState, Collections.singletonList(actor));
+            @NotNull final String onEvent,
+            @NotNull final String goToState,
+            @NotNull final TransitionActor<D, E> actor) {
+        this(onEvent, goToState, Collections.singletonList(checkNotNull(actor, "actor must not be null")));
     }
 
     /**
@@ -86,8 +77,8 @@ public class StateTransitionDefImpl<D extends StateTableData, E extends StateEve
      * @param goToState the state this transitions goes to
      */
     public StateTransitionDefImpl(
-            final String onEvent,
-            final String goToState) {
+            @NotNull final String onEvent,
+            @NotNull final String goToState) {
         this(onEvent, goToState, Collections.emptyList());
     }
 
@@ -109,27 +100,16 @@ public class StateTransitionDefImpl<D extends StateTableData, E extends StateEve
         return 31 * onEvent.hashCode() + goToState.hashCode();
     }
 
-    /**
-     * Returns the event identifier associated with this transition.
-     */
     @Override
     public final String getEventName() {
         return onEvent;
     }
 
-    /**
-     * Returns the identifier for the target state when the transition
-     * completes.
-     */
     @Override
     public final String getTargetStateName() {
         return goToState;
     }
 
-    /**
-     * Returns the string identifiers for the actions to be taken on this
-     * transition.
-     */
     @Override
     public final List<TransitionActor<D, E>> getActors() {
         return actors;

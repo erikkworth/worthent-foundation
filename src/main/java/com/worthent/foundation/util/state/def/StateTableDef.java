@@ -1,6 +1,3 @@
-/*
- * Copyright 2000-2015 Worth Enterprises, Inc.  All rights reserved.
- */
 package com.worthent.foundation.util.state.def;
 
 import com.worthent.foundation.util.annotation.NotNull;
@@ -54,26 +51,29 @@ import com.worthent.foundation.util.state.StateTableData;
  * @see StateDef
  * 
  * @author Erik K. Worth
- * @version $Id: StateTableDef.java 2 2011-11-28 00:10:06Z erik.k.worth@gmail.com $
  */
 public interface StateTableDef<D extends StateTableData, E extends StateEvent> {
 
     /**
-     * Returns the state table's name or <code>null</code> when none is set.
+     * @return the state table's name or <code>null</code> when none is set.
      */
     @Nullable
     String getName();
 
     /**
-     * Returns the initial state. The initial state is the first state added to
-     * this state table definition.
+     * Returns the initial state. The initial state is the first state added to this state table definition.
+     *
+     * @return the initial state
      */
     @NotNull
-    StateDef<D, E> getInitialState() throws StateDefException;
+    StateDef<D, E> getInitialState();
 
     /**
      * Returns <code>true</code> if the specified state identifier is present in
      * the state table.
+     *
+     * @param stateName the name of a state in the state table to check
+     * @return <code>true</code> if the specified state identifier is present in the state table
      */
     boolean containsState(@NotNull String stateName);
 
@@ -91,11 +91,11 @@ public interface StateTableDef<D extends StateTableData, E extends StateEvent> {
     /**
      * Returns the transition configured to respond to the specified event when
      * the table is in the specified state.
-     * 
+     *
      * @param stateName the string identifier for the state
      * @param eventName the string identifier for the event
-     * @exception StateExeException thrown when the state does not exist in the
-     *            state table
+     * @return the transition configured to respond to the specified event when the table is in the specified state
+     * @exception StateExeException thrown when the state does not exist in the state table
      */
     @NotNull
     StateTransitionDef<D, E> getTransition(

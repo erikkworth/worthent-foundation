@@ -113,7 +113,7 @@ public class StateTableDefImpl<D extends StateTableData, E extends StateEvent> i
      * this state table definition.
      */
     @NotNull
-    public StateDef<D, E> getInitialState() throws StateDefException {
+    public StateDef<D, E> getInitialState() {
         // Returns the first state defined in the table
         return stateTbl.values().iterator().next();
     }

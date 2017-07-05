@@ -3,7 +3,10 @@
  */
 package com.worthent.foundation.util.state.impl;
 
+import com.worthent.foundation.util.annotation.NotNull;
 import com.worthent.foundation.util.state.StateEvent;
+
+import static com.worthent.foundation.util.condition.Preconditions.checkNotNull;
 
 /**
  * State Event where the event types are enumerated.
@@ -11,13 +14,16 @@ import com.worthent.foundation.util.state.StateEvent;
  */
 public class StateEventEnumImpl<E extends Enum<E>> implements StateEvent {
 
+    /** The enumerated value identifying this event */
     private final E eventType;
 
-    public StateEventEnumImpl(final E eventType) {
-        if (null == eventType) {
-            throw new IllegalArgumentException("eventType must not be null");
-        }
-        this.eventType = eventType;
+    /**
+     * Construct with the event type
+     *
+     * @param eventType the enumerated value identifying this event
+     */
+    public StateEventEnumImpl(@NotNull final E eventType) {
+        this.eventType = checkNotNull(eventType, "eventType must not be null");
     }
 
     @Override
@@ -28,11 +34,11 @@ public class StateEventEnumImpl<E extends Enum<E>> implements StateEvent {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+    public boolean equals(final Object other) {
+        if (this == other) return true;
+        if (other == null || getClass() != other.getClass()) return false;
 
-        StateEventEnumImpl<?> that = (StateEventEnumImpl<?>) o;
+        StateEventEnumImpl<?> that = (StateEventEnumImpl<?>) other;
 
         return !(eventType != null ? !eventType.equals(that.eventType) : that.eventType != null);
 

@@ -3,6 +3,8 @@
  */
 package com.worthent.foundation.util.state;
 
+import com.worthent.foundation.util.annotation.NotNull;
+
 /**
  * Specifies methods implemented by objects that need to do something when a
  * state table transitions from one state to another.
@@ -17,7 +19,10 @@ public interface StateTransitioner<D extends StateTableData, E extends StateEven
 
     /**
      * Returns the name of the State Transitioner for logging purposes.
+     *
+     * @return the name of the State Transitioner for logging purposes
      */
+    @NotNull
     default String getName() {return UNNAMED;}
 
     /**
@@ -29,6 +34,6 @@ public interface StateTransitioner<D extends StateTableData, E extends StateEven
      * @exception StateExeException thrown when the onTransition method fails
      *            (it will prevent the state transition).
      */
-    void onTransition(TransitionContext<D, E> context) throws StateExeException;
+    void onTransition(@NotNull TransitionContext<D, E> context) throws StateExeException;
 
 }

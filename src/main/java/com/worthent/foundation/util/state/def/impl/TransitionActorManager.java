@@ -1,6 +1,3 @@
-/*
- * Copyright 2000-2015 Worth Enterprises, Inc.  All rights reserved.
- */
 package com.worthent.foundation.util.state.def.impl;
 
 import com.worthent.foundation.util.state.StateEvent;
@@ -25,7 +22,11 @@ public class TransitionActorManager<D extends StateTableData, E extends StateEve
         this.transitionActors = new HashMap<>();
     }
 
-    /** Add a transition actor */
+    /**
+     * Add a transition actor
+     *
+     * @param transitionActor the transition actor to register by name
+     */
     public void addTransitionActor(final TransitionActor<D, E> transitionActor) {
         if (null == transitionActor) {
             throw new IllegalArgumentException("transitionActor must not be null");
@@ -33,7 +34,12 @@ public class TransitionActorManager<D extends StateTableData, E extends StateEve
         transitionActors.put(transitionActor.getName(), transitionActor);
     }
 
-    /** Returns a transition actor by the provided name or <code>null</code> when none is found by that name */
+    /**
+     * Returns a transition actor by the provided name or <code>null</code> when none is found by that name
+     *
+     * @param actorName the name of the transition actor to retrieve
+     * @return the transition actor found by the provided name or <code>null</code> when none is found by that name
+     */
     public TransitionActor<D, E> getTransitionActor(final String actorName) {
         final TransitionActor<D, E> actor = transitionActors.get(actorName);
         if (null == actor) {

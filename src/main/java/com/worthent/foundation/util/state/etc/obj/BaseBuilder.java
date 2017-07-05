@@ -24,25 +24,32 @@ public abstract class BaseBuilder {
     /** The type of builder this is */
     private final BuilderType type;
 
+    /**
+     * Construct with a name and type
+     * @param type the builder type
+     * @param name the name of the entity being built
+     */
     public BaseBuilder(@NotNull final BuilderType type, @Nullable final String name) {
         this.type = checkNotNull(type, "type must not be null");
         this.name = name;
     }
 
-    /** Returns the name of the entity being built or <code>null</code> when not available */
+    /** @return the name of the entity being built or <code>null</code> when not available */
     @Nullable
     public String getName() {
         return name;
     }
 
-    /** Returns type of builder this is */
+    /** @return type of builder this is */
     @NotNull
     public BuilderType getType() {
         return type;
     }
 
-    /** Implemented by concrete method to return the builder for the nested field or <code>null</code> when there is
+    /**
+     * Implemented by concrete method to return the builder for the nested field or <code>null</code> when there is
      * no such field or there is no builder for the (probably) primitive field.
+     *
      * @param name the name of the nested entity below this one
      * @return returns the builder for the nested field or <code>null</code> when there is
      * no such field or there is no builder for the (probably) primitive field.
@@ -50,11 +57,20 @@ public abstract class BaseBuilder {
     @Nullable
     public abstract BaseBuilder getFieldBuilder(String name);
 
-    /** Construct the complex entity from its fields if any */
+    /**
+     * Construct the complex entity from its fields if any
+     *
+     * @return the complex entity
+     */
     @NotNull
     public abstract Object build();
 
-    /** Sets the value of the field on this object by the field name and object value */
+    /**
+     * Sets the value of the field on this object by the field name and object value
+     *
+     * @param name the name of the field
+     * @param value the field value
+     */
     @NotNull
     public abstract void set(@NotNull String name, @Nullable Object value);
 }

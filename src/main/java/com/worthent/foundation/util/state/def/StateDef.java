@@ -61,13 +61,13 @@ public interface StateDef<D extends StateTableData, E extends StateEvent> {
     String STATE_CHANGE_BY_ACTOR = "#StateChangeByActor#";
 
     /**
-     * Returns the identifier for this state.
+     * @return the identifier for this state.
      */
     @NotNull
     String getName();
 
     /**
-     * Returns the <code>StateTransitionDef</code> that originate from this state.
+     * @return the <code>StateTransitionDef</code> that originate from this state.
      */
     @NotNull
     Collection<StateTransitionDef<D, E>> getTransitions();
@@ -76,12 +76,17 @@ public interface StateDef<D extends StateTableData, E extends StateEvent> {
      * Returns the <code>StateTransitionDef</code> that handles the transition
      * for the specified event name or <code>null</code> if no transition is
      * configured for the specified event name.
+     *
+     * @param eventName the event identifying the transition definition for this state
+     * @return the <code>StateTransitionDef</code> that handles the transition
+     * for the specified event name or <code>null</code> if no transition is
+     * configured for the specified event name
      */
     @Nullable
-    StateTransitionDef<D, E> getTransitionForEvent(final String eventName);
+    StateTransitionDef<D, E> getTransitionForEvent(@NotNull final String eventName);
 
     /**
-     * Returns the state transition defined as the default when the received event matches no transition.
+     * @return the state transition defined as the default when the received event matches no transition.
      */
     @NotNull
     StateTransitionDef<D, E> getDefaultTransition();

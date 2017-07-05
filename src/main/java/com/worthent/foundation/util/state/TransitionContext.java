@@ -1,10 +1,6 @@
-/*
- * Copyright 2000-2015 Worth Enterprises, Inc.  All Rights Reserved.
- */
 package com.worthent.foundation.util.state;
 
-import com.worthent.foundation.util.state.StateEvent;
-import com.worthent.foundation.util.state.StateTable;
+import com.worthent.foundation.util.annotation.NotNull;
 
 /**
  * Specifies the information available from the context of transitioning from one state to another while processing
@@ -12,21 +8,27 @@ import com.worthent.foundation.util.state.StateTable;
  */
 public interface TransitionContext<D extends StateTableData, E extends StateEvent> {
 
-    /** Returns the current state where the event was received */
+    /** @return the current state where the event was received */
+    @NotNull
     String getFromState();
 
-    /** Returns the state to which the table will transition should everything work out */
+    /** @return the state to which the table will transition should everything work out */
+    @NotNull
     String getToState();
 
-    /** Returns a reference to the state table */
+    /** @return a reference to the state table */
+    @NotNull
     StateTable<D, E> getStateTable();
 
-    /** Returns a working copy of the state table data */
+    /** @return a working reference to the state table data */
+    @NotNull
     D getStateTableData();
 
-    /** Returns the state table controller */
+    /** @return the state table controller */
+    @NotNull
     StateTableControl<E> getStateTableControl();
 
-    /** Returns the event that trigger the state transition */
+    /** @return the event that trigger the state transition */
+    @NotNull
     E getEvent();
 }

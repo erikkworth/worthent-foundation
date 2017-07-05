@@ -1,8 +1,6 @@
-/*
- * Copyright 2000-2011 Worth Enterprises, Inc.  All Rights Reserved.
- */
 package com.worthent.foundation.util.state.def;
 
+import com.worthent.foundation.util.annotation.NotNull;
 import com.worthent.foundation.util.state.StateEvent;
 import com.worthent.foundation.util.state.StateTableData;
 import com.worthent.foundation.util.state.TransitionActors;
@@ -19,6 +17,8 @@ public class StateTransitionDefs {
      * there event not expected.
      * @param <D> the state table data type
      * @param <E> the event type
+     * @return the default state transition definition that stays in the same state and throws an exception indicating
+     * there event not expected
      */
     public static <D extends StateTableData, E extends StateEvent> StateTransitionDef<D, E> getUnexpectedEventDefaultTransition() {
         return new StateTransitionDefImpl<>(
@@ -31,6 +31,7 @@ public class StateTransitionDefs {
      * Returns a default state transition definition that stays in the same state silently ignoring the event.
      * @param <D> the state table data type
      * @param <E> the event type
+     * @return the default state transition definition that stays in the same state silently ignoring the event
      */
     public static <D extends StateTableData, E extends StateEvent> StateTransitionDef<D, E> getNoActionDefaultTransition() {
         return new StateTransitionDefImpl<>(
@@ -48,8 +49,8 @@ public class StateTransitionDefs {
      * @return a transition for the specified event that transitions to the specified state with no actions
      */
     public static <D extends StateTableData, E extends StateEvent> StateTransitionDef<D, E> getNoActionTransition(
-            final String onEvent,
-            final String toState) {
+            @NotNull final String onEvent,
+            @NotNull final String toState) {
         return new StateTransitionDefImpl<>(onEvent, toState);
     }
 }

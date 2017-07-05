@@ -26,17 +26,24 @@ public class ToStateNavigationActor<D extends StateTableData, E extends StateEve
 
     private final List<ToStateCondition<D, E>> toStateConditions;
 
+    /**
+     * Construct with the list of conditions that when evaluated determine the target state of the transition.
+     *
+     * @param toStateConditions the conditions that when evaluated determine the target state of the transition
+     */
     public ToStateNavigationActor(@NotNull final List<ToStateCondition<D, E>> toStateConditions) {
         this.toStateConditions = checkNotNull(toStateConditions, "toStateConditions must not be null");
     }
 
     @Override
+    @NotNull
     public String getName() {
         return "ToStateNavigationActor";
     }
 
     @Override
     public void onAction(@NotNull final TransitionContext<D, E> context) throws StateExeException {
+        checkNotNull(context, "context must not be null");
         // Test the conditions to find the first one that is satisfied
         final Optional<ToStateCondition<D, E>> satisfiedCondition =
                 toStateConditions.stream().filter(c -> c.test(context)).findFirst();

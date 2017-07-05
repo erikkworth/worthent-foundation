@@ -1,7 +1,6 @@
-/*
- * Copyright 2000-2011 Worth Enterprises, Inc.  All Rights Reserved.
- */
 package com.worthent.foundation.util.state;
+
+import com.worthent.foundation.util.annotation.NotNull;
 
 /**
  * Specifies methods implemented by objects that perform actions during state
@@ -16,8 +15,9 @@ public interface TransitionActor<D extends StateTableData, E extends StateEvent>
     String UNNAMED = "UNNAMED_ACTOR";
 
     /**
-     * Returns the name of the StateActor for logging purposes.
+     * @return the name of the StateActor for logging purposes.
      */
+    @NotNull
     default String getName() {return UNNAMED;}
 
     /**
@@ -32,6 +32,6 @@ public interface TransitionActor<D extends StateTableData, E extends StateEvent>
      *            prevents the state transition and subsequent action methods
      *            from being invoked)
      */
-    void onAction(TransitionContext<D, E> context) throws StateExeException;
+    void onAction(@NotNull TransitionContext<D, E> context) throws StateExeException;
 
 }

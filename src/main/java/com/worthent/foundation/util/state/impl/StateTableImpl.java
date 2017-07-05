@@ -3,6 +3,8 @@
  */
 package com.worthent.foundation.util.state.impl;
 
+import com.worthent.foundation.util.annotation.NotNull;
+import com.worthent.foundation.util.annotation.Nullable;
 import com.worthent.foundation.util.state.StateErrorHandler;
 import com.worthent.foundation.util.state.StateEvent;
 import com.worthent.foundation.util.state.StateTable;
@@ -16,11 +18,12 @@ import org.slf4j.LoggerFactory;
 
 import com.worthent.foundation.util.state.def.StateTableDef;
 
+import static com.worthent.foundation.util.condition.Preconditions.checkNotNull;
+
 /**
  * Provides an in-memory implementation of the state table instance.
  * 
  * @author Erik K. Worth
- * @version $Id: StateTableImpl.java 2 2011-11-28 00:10:06Z erik.k.worth@gmail.com $
  */
 public class StateTableImpl<D extends StateTableData, E extends StateEvent> implements StateTable<D, E> {
 
@@ -28,7 +31,7 @@ public class StateTableImpl<D extends StateTableData, E extends StateEvent> impl
     private static final Logger LOGGER = LoggerFactory.getLogger(StateTableImpl.class);
 
     /** The state table error handler to use */
-    private final StateErrorHandler errorHandler;
+    private final StateErrorHandler<D, E> errorHandler;
 
     /** The state transitioner to use */
     private final StateTransitioner<D, E> stateTransitioner;
@@ -50,65 +53,43 @@ public class StateTableImpl<D extends StateTableData, E extends StateEvent> impl
      *                          to use the default state transitioner that simply writes messages to the logger
      */
     StateTableImpl(
-            final StateTableDef<D, E> stateTblDef,
-            final StateTableDataManager<D, E> stateTableDataManager,
-            final StateErrorHandler errorHandler,
-            final StateTransitioner<D, E> stateTransitioner) {
-        if (null == stateTblDef) {
-            throw new IllegalArgumentException("stateTableDef must nto be null");
-        }
-        if (null == stateTableDataManager) {
-            throw new IllegalArgumentException("stateTableDataManager must nto be null");
-        }
-        this.stateTblDef = stateTblDef;
-        this.stateTableDataManager = stateTableDataManager;
+            @NotNull final StateTableDef<D, E> stateTblDef,
+            @NotNull final StateTableDataManager<D, E> stateTableDataManager,
+            @Nullable final StateErrorHandler<D, E> errorHandler,
+            @Nullable final StateTransitioner<D, E> stateTransitioner) {
+        this.stateTblDef = checkNotNull(stateTblDef, "stateTblDef must not be null");
+        this.stateTableDataManager = checkNotNull(stateTableDataManager, "stateTableDataManager must not be null");
         this.errorHandler = (null == errorHandler) ? new LoggingStateErrorHandler(LOGGER) : errorHandler;
         this.stateTransitioner = (null == stateTransitioner) ? new LoggingStateTransitioner<>(LOGGER) : stateTransitioner;
     }
 
-    //
-    // StateTable
-    //
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * com.worthent.foundation.core.util.state.StateTable#getStateTableName()
-     */
     @Override
+    @Nullable
     public String getStateTableName() {
         return stateTblDef.getName();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.worthent.foundation.core.util.state.StateTable#getErrorHandler()
-     */
     @Override
-    public StateErrorHandler getErrorHandler() {
+    @NotNull
+    public StateErrorHandler<D, E> getErrorHandler() {
         return errorHandler;
     }
 
     @Override
+    @NotNull
     public StateTableDataManager<D, E> getStateTableDataManager() {
         return stateTableDataManager;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.worthent.foundation.core.util.state.StateTable#getTransitioner()
-     */
     @Override
+    @NotNull
     public StateTransitioner<D, E> getTransitioner() {
         return stateTransitioner;
     }
 
-    /** Returns the state table definition */
     @Override
-    public StateTableDef<D, E> getStateTableDefinition(final StateEvent event) {
+    @NotNull
+    public StateTableDef<D, E> getStateTableDefinition() {
         return stateTblDef;
     }
 

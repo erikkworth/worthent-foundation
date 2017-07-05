@@ -5,6 +5,7 @@ package com.worthent.foundation.util.state.impl;
 
 import java.util.List;
 
+import com.worthent.foundation.util.annotation.NotNull;
 import com.worthent.foundation.util.state.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +13,8 @@ import org.slf4j.LoggerFactory;
 import com.worthent.foundation.util.state.def.StateDef;
 import com.worthent.foundation.util.state.def.StateTableDef;
 import com.worthent.foundation.util.state.def.StateTransitionDef;
+
+import static com.worthent.foundation.util.condition.Preconditions.checkNotNull;
 
 /**
  * Orchestrates the activities involved when receiving an event while in a given
@@ -50,6 +53,7 @@ import com.worthent.foundation.util.state.def.StateTransitionDef;
  * @version $Id: StateEngine.java 2 2011-11-28 00:10:06Z erik.k.worth@gmail.com $
  */
 public final class StateEngine<D extends StateTableData, E extends StateEvent> {
+
     /** Logger for this class */
     private static final Logger LOGGER =
         LoggerFactory.getLogger(StateEngine.class);
@@ -69,6 +73,7 @@ public final class StateEngine<D extends StateTableData, E extends StateEvent> {
      * state and returns the new state of the state table.
      * 
      * @param table the definition of the state table
+     * @param stateTableControl the control object that feeds events into the state table
      * @param event the event being applied to the state table to trigger a
      *        transition
      * 
@@ -77,20 +82,15 @@ public final class StateEngine<D extends StateTableData, E extends StateEvent> {
      *            expected to roll back any transactions
      */
     public void processEvent(
-        final StateTable<D, E> table,
-        final StateTableControl<E> stateTableControl,
-        final E event) throws StateExeException {
+        @NotNull final StateTable<D, E> table,
+        @NotNull final StateTableControl<E> stateTableControl,
+        @NotNull final E event) throws StateExeException {
+        checkNotNull(table, "table must not be null");
+        checkNotNull(stateTableControl, "stateTableControl must not be null");
+        checkNotNull(event, "event must not be null");
+
         // Get the state table metadata
-        final StateTableDef<D, E> metadata;
-        try {
-            metadata = table.getStateTableDefinition(event);
-        } catch (Exception err) {
-            throw new StateExeException(
-                "Error retrieving the state table definition given the event, '" +
-                    event.getName() +
-                    "'.",
-                err);
-        }
+        final StateTableDef<D, E> metadata = table.getStateTableDefinition();
 
         // Get a copy of the state history from the state table instance
         final D history;
@@ -108,14 +108,8 @@ public final class StateEngine<D extends StateTableData, E extends StateEvent> {
         final String currentState = history.getCurrentState();
         final String priorState = history.getPriorState();
 
-        if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("State table, " +
-                metadata.getName() +
-                ", processing event, " +
-                event +
-                ", while in state, " +
-                currentState);
-        }
+        LOGGER.trace("State table, {}, processing event, {}, while in state, {}" +
+                metadata.getName(), event, currentState);
 
         try {
             // Retrieve the current state
@@ -130,8 +124,7 @@ public final class StateEngine<D extends StateTableData, E extends StateEvent> {
 
             // Get the transition referenced by the event name or if not found,
             // get the default
-            StateTransitionDef<D, E> transition =
-                    state.getTransitionForEvent(event.getName());
+            StateTransitionDef<D, E> transition = state.getTransitionForEvent(event.getName());
             if (null == transition) {
                 transition = state.getDefaultTransition();
             }
@@ -155,7 +148,7 @@ public final class StateEngine<D extends StateTableData, E extends StateEvent> {
                     actor.onAction(transitionContext);
                 } catch (Exception exc) {
 
-                    // Let registered error handler do something
+                    // Let the registered error handler do something
                     this.invokeErrorHandler(transitionContext, actor, exc);
 
                     final String actorName = actor.getName();
@@ -175,14 +168,11 @@ public final class StateEngine<D extends StateTableData, E extends StateEvent> {
             StateTransitioner<D, E> transitioner = table.getTransitioner();
             if (null != transitioner) {
                 try {
-
                     // Act on the state transition
                     transitioner.onTransition(transitionContext);
                 } catch (Exception exc) {
-
-                    // Let registered error handler do something
+                    // Let the registered error handler do something
                     this.invokeErrorHandler(transitionContext, null, exc);
-
                     throw new StateExeException("The transitioner, '" +
                             transitioner.getName() +
                             "', encountered an error in state table, '" +
@@ -225,13 +215,11 @@ public final class StateEngine<D extends StateTableData, E extends StateEvent> {
             // The error handler was already run
             throw exc;
         } catch (RuntimeException exc) {
-
             // Let registered error handler do something
             this.invokeErrorHandler(
                     new TransitionContextImpl<>(currentState, UNKNOWN, table, history, stateTableControl, event),
                     null,
                     exc);
-
             throw new StateExeException(
                 "There was an error in the state table, '" +
                     metadata.getName() +
@@ -261,7 +249,7 @@ public final class StateEngine<D extends StateTableData, E extends StateEvent> {
                 // Forward to registered error handler
                 errorHandler.onError(context, actor, cause);
             }
-        } catch (Exception ignore) {
+        } catch (final Exception ignore) {
             // Empty
         }
     } // invokeErrorHandler

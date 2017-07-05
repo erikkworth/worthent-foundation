@@ -35,27 +35,48 @@ public class ObjectConstructionEvent implements StateEvent {
     enum PayloadType {
         NONE,
         ENTITY_NAME,
-        VALUE;
+        VALUE
     }
 
+    /**
+     * @return the Root Start object construction event
+     */
     public static ObjectConstructionEvent getRootStartEvent() {
         return ROOT_START_EVENT;
     }
 
+    /**
+     * @return the Done object construction event
+     */
     public static ObjectConstructionEvent getDoneEvent() {
         return DONE_EVENT;
     }
 
+    /**
+     * Returns the Entity Start object construction event with the provided entity name
+     *
+     * @param entityName the name of the entity to start building
+     * @return the Entity Start object construction event
+     */
     public static ObjectConstructionEvent newEntityStartEvent(@NotNull final String entityName) {
         checkNotNull(entityName, "entityName must not be null");
         return new ObjectConstructionEvent(EVENT_ENTITY_START, PayloadType.ENTITY_NAME, entityName);
     }
 
+    /**
+     * Returns the Simple Value object construction event with the provided simple value
+     *
+     * @param simpleValue the simple value to set into the parent complex object
+     * @return the Simple Value object construction event
+     */
     public static ObjectConstructionEvent newSimpleValueEvent(@NotNull final Object simpleValue) {
         checkNotNull(simpleValue, "simpleValue must not be null");
         return new ObjectConstructionEvent(EVENT_SIMPLE_VALUE, PayloadType.VALUE, simpleValue);
     }
 
+    /**
+     * @return the Object Done object construction event
+     */
     public static ObjectConstructionEvent newObjectDoneEvent() {
         return OBJECT_DONE_EVENT;
     }
@@ -69,6 +90,13 @@ public class ObjectConstructionEvent implements StateEvent {
     /** The event payload */
     private final Object payload;
 
+    /**
+     * Construct with the event name, the type of payload and the payload value
+     *
+     * @param eventName the event name
+     * @param payloadType the type of payload for this event
+     * @param payload the payload value to be interpreted based on the payload type
+     */
     private ObjectConstructionEvent(
             @NotNull final String eventName,
             @NotNull final PayloadType payloadType,
@@ -91,7 +119,12 @@ public class ObjectConstructionEvent implements StateEvent {
         return (null == payload) ? getName() : getName() + " \"" + payload + "\"";
     }
 
-    /** Returns the value cast to the expected type */
+    /**
+     * Returns the value cast to the expected type
+     *
+     * @param payloadType the expected payload type as a sanity check
+     * @return the event payload value
+     */
     public Object get(@NotNull final PayloadType payloadType) {
         if (!this.payloadType.equals(payloadType)) {
             throw new IllegalStateException("The caller requested a payload type of " + payloadType +

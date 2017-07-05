@@ -3,6 +3,7 @@
  */
 package com.worthent.foundation.util.state.data;
 
+import com.worthent.foundation.util.annotation.NotNull;
 import com.worthent.foundation.util.state.StateEvent;
 import com.worthent.foundation.util.state.StateExeException;
 import com.worthent.foundation.util.state.StateTableControl;
@@ -34,11 +35,14 @@ public interface StateTableDataManager<D extends StateTableData, E extends State
      * a call to {@link #setStateTableData(StateEvent, StateTableData)}.
      *
      * @param event the event being processed
+     * @return a reference to the state table data object that minimally holds the
+     * current and prior states of the state table instance
      *
      * @throws StateExeException thrown when there is an error retrieving the
      *             state history
      */
-    D getStateTableData(E event) throws StateExeException;
+    @NotNull
+    D getStateTableData(@NotNull E event) throws StateExeException;
 
     /**
      * Updates the state table instance with a new value of the data object that
@@ -54,5 +58,5 @@ public interface StateTableDataManager<D extends StateTableData, E extends State
      * @throws StateExeException thrown when there is an error setting the state
      *             history
      */
-    void setStateTableData(E event, D dataObject) throws StateExeException;
+    void setStateTableData(@NotNull E event, @NotNull D dataObject) throws StateExeException;
 }

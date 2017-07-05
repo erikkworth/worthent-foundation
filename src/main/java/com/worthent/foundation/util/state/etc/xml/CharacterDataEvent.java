@@ -21,7 +21,7 @@ public class CharacterDataEvent extends XmlEvent {
         return EVENT_NAME;
     }
 
-    /** Returns the character data */
+    /** @return the character data */
     public final String getCharacterData() {
         return charData;
     }
@@ -41,6 +41,10 @@ public class CharacterDataEvent extends XmlEvent {
         super(EVENT_NAME);
     }
 
+    /**
+     * Set the character data received in the SAX event
+     * @param charData the character data received in the SAX event
+     */
     void setCharacterData(final String charData) {
         this.charData = charData;
     }

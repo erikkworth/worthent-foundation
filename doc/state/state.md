@@ -13,7 +13,7 @@ State machines are good for a few different kinds of use cases that are all natu
 * a terminal emulator
 * an XML Parser based on the SAX Parser
 
-They can serve will in software systems that control mechanical devices and in controllers supporting an interactive user interface.  They also work well in parsers as you will see below.
+They can serve well in software systems that control mechanical devices and in controllers supporting an interactive user interface.  They also work well in parsers as you will see below.
 
 Because state tables employ a higher level of abstraction than common procedural code, they can make highly event-driven and asynchronous software more reliable (with fewer defects).  Perhaps the biggest downside is that the developer needs to think a little differently when creating solutions that use state tables.
 
@@ -53,7 +53,7 @@ In order for a person to get through the turnstile, the attendant needs to scan 
 
 A **Transition Actor** is a piece of code that is configured to run during the state transition.  A given Transition Actor can be used in multiple places in the state table and you can see from the diagram that it is indeed used in two places (one with the Ticket event and the other with the Push event).  The configuration for a state transition between two states can list more than one and they run in the order they are listed.
 
-So now you have an overview of the concept, so let's break down the machine into its parts.  At the high level, the state table has these parts:
+Now you have an overview of the concept, so let's break down the machine into its parts.  At the high level, the state table has these parts:
 
 * the state table definition (identifying the states, transition between states on events, and the transition actors that do work)
 * the data on which the state table works (that minimally identifies the state the state table is in at any given time)
@@ -253,7 +253,7 @@ public interface StateTableDataManager<D extends StateTableData, E extends State
     void setStateTableData(E event, D dataObject) throws StateExeException;
 }
 ```
-The builder provides an implementation of this class that uses lambdas so that you can specify the each of the operations directly in the builder, but you can also provide your own implementation of the data manager and set that into the State Table using the builder.
+The builder provides an implementation of this class that uses lambdas so that you can specify each of the operations directly in the builder, but you can also provide your own implementation of the data manager and set that into the State Table using the builder.
 
 Your state table may not require special implementations for all three of the data management operations depending on your data management needs, but you will minimally need to provide the get operation to the builder (it provides no-op operations for the others when left out).  With the three operations available to you, you can provide code that:
 
@@ -282,7 +282,7 @@ public interface TransitionActor<D extends StateTableData, E extends StateEvent>
     String UNNAMED = "UNNAMED_ACTOR";
 
     /**
-     * Returns the name of the StateActor for logging purposes.
+     * Returns the name of the Transition Actor.
      */
     default String getName() {return UNNAMED;}
 
@@ -311,7 +311,7 @@ The State Table Builder looks for `@Actor` tags and creates an implementation of
 
 You can see that the `increment` method in the `TurnstileData` object takes the TransitionContext as a parameter.  In most cases when you tag a method on your data object as a Transition Actor, you will only need to reference the event - the Transition Actor implementation will extract the event from the context and just pass that when it sees your method takes the event type as an argument.
 
-The only Transition Actor in the `TurnstileData` simply increments a count for the event.  You can imagine that the park operations would want to know how many tickets were scanned and how many people went though as a means to audit their attendance numbers, so the class has accessors for the two counts.  In reality this example is probably too simple for a real park, but you can imagine that it would probably really need to invoke some methods to actually lock and unlock the turnstile mechanisms and would probably store the data persistently, but that is beyond the scope of an example.
+The only Transition Actor in the `TurnstileData` simply increments a count for the event.  You can imagine that the park operations would want to know how many tickets were scanned and how many people went though as a means to audit their attendance numbers, so the class has accessors for the two counts.  In reality this example is probably too simple for a real park turnstile device, but you can imagine that a real device would probably need to invoke some methods to actually lock and unlock the turnstile mechanisms and would probably store the data persistently, but that is beyond the scope of an example.
 
 ### State Table Definition
 
@@ -444,7 +444,7 @@ The `StateEngine` processes a single event submitted by the `StateTableControl` 
    * State Table Control
    * Event
 1. Get the list of Transition Actors
-1. Invoke each Transition Actor in order
+1. Invoke each Transition Actor in order with the Transition Context
 1. Get the State Transitioner from the State Table and invoke it if not `null`
 1. Call the setter on the State Table Data Manager to set the updated data
 
@@ -741,7 +741,7 @@ The data produced by the SAX parser drives the design of the XML Event objects. 
 * The `EndElementEvent` has the name of the element
 * The `WhiteSpaceEvent` is like the `CharacterDataEvent` but it only has white space characters in it
 
-The `SaxEventAdapter` class implements all the methods required to consume SAX Events and defines all the XML Events as either constants or instance variables in the class.  Events that carry not data can safely be declared as constants.  It is a best practice to declare events as constants where possible (they must be immutable) and reuse them to avoid unnecessary object creation.  In general it is not safe to reuse events that carry variable data unless the state table is controlled using the `SerialStateTableControl`.  This implementation of the `StateTableControl` interface processes each event synchronously as it is received.  That means there will never be two events in flight at the same time and it is OK to declare each type of event as an instance variable without having the event data overwritten.  This is an optimization that avoids creating a new object for each submitted events.  This technique cannot be employed when the state table is asynchronous with queues and threads.  The `SerialStateTableControl` is typically a good choice for parsers since all the events come from the same source.
+The `SaxEventAdapter` class implements all the methods required to consume SAX Events and defines all the XML Events as either constants or instance variables in the class.  Events that carry no data can safely be declared as constants.  It is a best practice to declare events as constants where possible (they must be immutable) and reuse them to avoid unnecessary object creation.  In general it is not safe to reuse events that carry variable data unless the state table is controlled using the `SerialStateTableControl`.  This implementation of the `StateTableControl` interface processes each event synchronously as it is received.  That means there will never be two events in flight at the same time and it is OK to declare each type of event as an instance variable without having the event data overwritten.  This is an optimization that avoids creating a new object for each submitted events.  This technique cannot be employed when the state table is asynchronous with queues and threads.  The `SerialStateTableControl` is typically a good choice for parsers since all the events come from the same source.
 
 Here is a state transition diagram for the XML Object Builder Adapter state machine:
 
@@ -1108,7 +1108,7 @@ The last link in the processing chain is another state table that knows how to c
 
 This state machine starts off in the state where it is Awaiting the Root Start event from the upstream state machine.  When it receives the Root Start event it transitions to the Awaiting Entity Start state.  When in this state, it looks for Entity Start Events and uses the entity name to lookup in the type information from the class annotations to figure if it is to start building a list, an object, or a simple field on an object (the latter two are handled from the Building Entity State).  The `ObjectData` (the data object for the state table) maintains a stack of objects being constructed.  The Process Entity Start and Process Nested Entity Start actions can push new objects onto the stack.  The Process Object Done methods can pop constructed objects off the stack.
 
-This state machine demonstrates another feature of the utility: a transition that drives the state machine to different states based on a condition.  Both the Awaiting Entity Start has two such conditional transitions: one for the Entity Start event and the other for the Object Done event.  Look to see how these are configured using the builder to create the state table definition:
+This state machine demonstrates another feature of the utility: a transition that drives the state machine to different states based on a condition.  The **Awaiting Entity Start** state has two such conditional transitions: one for the **Entity Start** event and the other for the **Object Done** event.  Look to see how these are configured using the builder to create the state table definition:
 
 ```java
 package com.worthent.foundation.util.state.etc.obj;

@@ -15,7 +15,7 @@ public interface TransitionActor<D extends StateTableData, E extends StateEvent>
     String UNNAMED = "UNNAMED_ACTOR";
 
     /**
-     * @return the name of the StateActor for logging purposes.
+     * @return the name of the Transition Actor.
      */
     @NotNull
     default String getName() {return UNNAMED;}

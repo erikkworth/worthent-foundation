@@ -6,7 +6,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.worthent.foundation</groupId>
   <artifactId>worthent-foundation</artifactId>
-  <version>1.0.0</version>
+  <version>1.0.1</version>
   <packaging>jar</packaging>
   <name>worthent-foundation</name>
   <inceptionYear>2000</inceptionYear>

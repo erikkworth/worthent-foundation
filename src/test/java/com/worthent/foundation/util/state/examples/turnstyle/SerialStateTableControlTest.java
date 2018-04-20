@@ -3,10 +3,9 @@
  */
 package com.worthent.foundation.util.state.examples.turnstyle;
 
-import com.worthent.foundation.util.state.*;
-import com.worthent.foundation.util.state.def.StateDef;
-import com.worthent.foundation.util.state.def.StateTransitionDefs;
-import com.worthent.foundation.util.state.impl.StateTableBuilderImpl;
+import com.worthent.foundation.util.state.StateEvent;
+import com.worthent.foundation.util.state.StateExeException;
+import com.worthent.foundation.util.state.StateTableControl;
 import com.worthent.foundation.util.state.provider.SerialStateTableControl;
 import org.junit.Before;
 import org.junit.Rule;
@@ -16,7 +15,15 @@ import org.junit.runner.Description;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.LinkedList;
+
+import static com.worthent.foundation.util.state.examples.turnstyle.TurnstileStateTable.OFF_EVENT;
+import static com.worthent.foundation.util.state.examples.turnstyle.TurnstileStateTable.ON_EVENT;
+import static com.worthent.foundation.util.state.examples.turnstyle.TurnstileStateTable.PUSH_EVENT;
+import static com.worthent.foundation.util.state.examples.turnstyle.TurnstileStateTable.TICKET_EVENT;
+import static com.worthent.foundation.util.state.examples.turnstyle.TurnstileStateTable.assertExpectedState;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Test cases for the builder that defines a state table.
@@ -27,51 +34,13 @@ public class SerialStateTableControlTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SerialStateTableControlTest.class);
 
-    private static final StateEvent ON_EVENT = StateEvents.enumeratedStateEvent(TurnstileEventType.ON);
-    private static final StateEvent PUSH_EVENT = StateEvents.enumeratedStateEvent(TurnstileEventType.PUSH);
-    private static final StateEvent TICKET_EVENT = StateEvents.enumeratedStateEvent(TurnstileEventType.TICKET);
-    private static final StateEvent OFF_EVENT = StateEvents.enumeratedStateEvent(TurnstileEventType.OFF);
+    /** The list of state transitions through which the state table transitioned during the test */
+    private LinkedList<String> stateQueue;
 
-    /** State table data */
-    private TurnstileData stateTableData;
+    /** The state table used to test the controller */
+    private TurnstileStateTable turnstileStateTable;
 
-    /** State table representing a turnstile like you find in amusement parks */
-    private final StateTable<TurnstileData, StateEvent> turnstileStateTable =
-        new StateTableBuilderImpl<TurnstileData, StateEvent>()
-            .withStateTableDefinition()
-                .setName("Turnstile")
-                .usingActorsInClass(TurnstileData.class)
-                .withState(TurnstileStates.OFF.name())
-                    .transitionOnEvent(TurnstileEventType.ON.name()).toState(TurnstileStates.LOCKED.name()).endTransition()
-                    .withDefaultEventHandler().toState(StateDef.STAY_IN_STATE).endTransition()
-                    .endState()
-                .withState(TurnstileStates.LOCKED.name())
-                    .transitionOnEvent(TurnstileEventType.TICKET.name())
-                        .toState(TurnstileStates.UNLOCKED.name())
-                        .withActorsByName(TurnstileData.INCREMENT_COUNT)
-                        .endTransition()
-                    .transitionOnEvent(TurnstileEventType.PUSH.name()).toState(StateDef.STAY_IN_STATE).endTransition()
-                    .transitionOnEvent(TurnstileEventType.OFF.name()).toState(TurnstileStates.OFF.name()).endTransition()
-                    .withDefaultEventHandler(StateTransitionDefs.getUnexpectedEventDefaultTransition())
-                    .endState()
-                .withState(TurnstileStates.UNLOCKED.name())
-                    .transitionOnEvent(TurnstileEventType.TICKET.name()).toState(StateDef.STAY_IN_STATE).endTransition()
-                    .transitionOnEvent(TurnstileEventType.PUSH.name())
-                        .toState(TurnstileStates.LOCKED.name())
-                        .withActorsByName(TurnstileData.INCREMENT_COUNT)
-                        .endTransition()
-                    .transitionOnEvent(TurnstileEventType.OFF.name()).toState(TurnstileStates.OFF.name()).endTransition()
-                    .withDefaultEventHandler(StateTransitionDefs.getUnexpectedEventDefaultTransition())
-                    .endState()
-                .endDefinition()
-            .withStateTableDataManager()
-                .withInitializer(() -> stateTableData = new TurnstileData())
-                .withDataGetter((e) -> new TurnstileData(stateTableData))
-                .withDataSetter((e, updatedData) -> stateTableData.set(updatedData))
-                .endDataManager()
-            .build();
-
-    // The controller being tested
+    /** The state table controller being tested here */
     private StateTableControl<StateEvent> stateTableController;
 
     @Rule
@@ -83,29 +52,44 @@ public class SerialStateTableControlTest {
     };
 
     @Before
-    public void setup() throws Exception {
-        stateTableController = new SerialStateTableControl<>(turnstileStateTable);
+    public void setup() {
+        stateQueue = new LinkedList<>();
+        turnstileStateTable = new TurnstileStateTable(stateQueue);
+        stateTableController = new SerialStateTableControl<>(turnstileStateTable.getTurnstileStateTable());
     }
 
     @Test
-    public void testOneTurnstileEntry() throws Exception {
+    public void testOneTurnstileEntry() {
         stateTableController.start();
         stateTableController.signalEvent(ON_EVENT);
         stateTableController.signalEvent(TICKET_EVENT);
         stateTableController.signalEvent(PUSH_EVENT);
         stateTableController.signalEvent(OFF_EVENT);
 
+        assertExpectedState(stateQueue, TurnstileStates.LOCKED);
+        assertExpectedState(stateQueue, TurnstileStates.UNLOCKED);
+        assertExpectedState(stateQueue, TurnstileStates.LOCKED);
+        assertExpectedState(stateQueue, TurnstileStates.OFF);
+        assertTrue("Expected empty stateQueue", stateQueue.isEmpty());
+
+        final TurnstileData stateTableData = turnstileStateTable.getStateTableData();
         assertEquals("Expected Turn Count", 1, stateTableData.getTurnCount());
         assertEquals("Expected Ticket Count", 1, stateTableData.getTicketCount());
     }
 
     @Test
-    public void testNoEntryWithoutCoin() throws Exception {
+    public void testNoEntryWithoutCoin() {
         stateTableController.start();
         stateTableController.signalEvent(ON_EVENT);
         stateTableController.signalEvent(PUSH_EVENT);
         stateTableController.signalEvent(PUSH_EVENT);
 
+        assertExpectedState(stateQueue, TurnstileStates.LOCKED);
+        assertExpectedState(stateQueue, TurnstileStates.LOCKED);
+        assertExpectedState(stateQueue, TurnstileStates.LOCKED);
+        assertTrue("Expected empty stateQueue", stateQueue.isEmpty());
+
+        final TurnstileData stateTableData = turnstileStateTable.getStateTableData();
         assertEquals("Expected Turn Count", 0, stateTableData.getTurnCount());
         assertEquals("Expected Ticket Count", 0, stateTableData.getTicketCount());
 
@@ -113,12 +97,17 @@ public class SerialStateTableControlTest {
         stateTableController.signalEvent(PUSH_EVENT);
         stateTableController.signalEvent(OFF_EVENT);
 
+        assertExpectedState(stateQueue, TurnstileStates.UNLOCKED);
+        assertExpectedState(stateQueue, TurnstileStates.LOCKED);
+        assertExpectedState(stateQueue, TurnstileStates.OFF);
+        assertTrue("Expected empty stateQueue", stateQueue.isEmpty());
+
         assertEquals("Expected Turn Count", 1, stateTableData.getTurnCount());
         assertEquals("Expected Ticket Count", 1, stateTableData.getTicketCount());
     }
 
     @Test(expected=StateExeException.class)
-    public void testUnexpectedOnEventWhileAlreadyOn() throws Exception {
+    public void testUnexpectedOnEventWhileAlreadyOn() {
         stateTableController.start();
         stateTableController.signalEvent(ON_EVENT);
         stateTableController.signalEvent(ON_EVENT);

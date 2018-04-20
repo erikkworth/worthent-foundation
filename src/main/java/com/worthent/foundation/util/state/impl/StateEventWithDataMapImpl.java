@@ -5,6 +5,7 @@ package com.worthent.foundation.util.state.impl;
 
 import com.worthent.foundation.util.annotation.NotNull;
 import com.worthent.foundation.util.annotation.Nullable;
+import com.worthent.foundation.util.state.StateEvent;
 import com.worthent.foundation.util.state.StateEventWithDataMap;
 
 import java.util.Collections;
@@ -46,6 +47,12 @@ public class StateEventWithDataMapImpl implements StateEventWithDataMap {
     @Nullable
     public <T> T getEventData(@Nullable final String key) {
         return (T) eventData.get(key);
+    }
+
+    @Override
+    @NotNull
+    public <T> T getRequiredEventData(@Nullable final String key) {
+        return checkNotNull(getEventData(key), key + " missing from event data");
     }
 
     @Override

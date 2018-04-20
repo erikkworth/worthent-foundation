@@ -1,18 +1,20 @@
-/*
- * Copyright 2000-2015 Worth Enterprises, Inc.  All rights reserved.
- */
 package com.worthent.foundation.util.state.def.impl;
 
 import com.worthent.foundation.util.annotation.NotNull;
 import com.worthent.foundation.util.state.StateEvent;
 import com.worthent.foundation.util.state.StateTableData;
 import com.worthent.foundation.util.state.TransitionActor;
-import com.worthent.foundation.util.state.def.*;
+import com.worthent.foundation.util.state.def.StateDef;
+import com.worthent.foundation.util.state.def.StateDefBuilder;
+import com.worthent.foundation.util.state.def.StateTransitionDef;
+import com.worthent.foundation.util.state.def.StateTransitionDefBuilder;
+import com.worthent.foundation.util.state.def.ToStateConditionBuilder;
 import com.worthent.foundation.util.state.provider.ToStateNavigationActor;
 
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.worthent.foundation.util.condition.Preconditions.checkNotBlank;
@@ -84,21 +86,26 @@ public class StateTransitionDefBuilderImpl<D extends StateTableData, E extends S
 
     @Override
     @NotNull
+    public Set<String> getPotentialTargetStateNames() {
+        return StateTransitionDefImpl.getPotentialTargetStateNames(goToState, transitionActors);
+    }
+
+    @Override
+    @NotNull
     public List<TransitionActor<D, E>> getActors() {
         return transitionActors;
     }
 
     @NotNull
     @Override
-    public StateTransitionDefBuilder<D, E> toState(@NotNull final String goToState) {
-        if (null == goToState) {
-            throw new IllegalArgumentException("goToState must not be null");
-        }
-        if (goToState.trim().length() == 0) {
-            throw new IllegalArgumentException("goToState must not be blank");
-        }
-        this.goToState = goToState;
+    public StateTransitionDefBuilder<D, E> toState(@NotNull final String targetStateName) {
+        this.goToState = checkNotBlank(targetStateName, "targetStateName must not be blank");
         return this;
+    }
+
+    @Override
+    public StateTransitionDefBuilder<D, E> toState(Enum<?> targetState) {
+        return toState(checkNotNull(targetState, "targetState must not be null").name());
     }
 
     @Override
@@ -111,10 +118,21 @@ public class StateTransitionDefBuilderImpl<D extends StateTableData, E extends S
 
     @Override
     @NotNull
+    public ToStateConditionBuilder<D, E> toStateConditionally(@NotNull final Enum<?> goToState) {
+        return toStateConditionally(checkNotNull(goToState, "gotoState must not be null").name());
+    }
+
+    @Override
+    @NotNull
     public ToStateConditionBuilder<D, E> toStateConditionallyBeforeEvent(@NotNull final String goToState) {
         final ToStateConditionListBuilderImpl<D, E> toStateConditionListBuilder =
                 new ToStateConditionListBuilderImpl<>(this, ToStateConditionListBuilderImpl.CheckPosition.BEFORE_ACTORS);
-        return toStateConditionListBuilder.orToState(checkNotNull(goToState, "goToState must not be null"));
+        return toStateConditionListBuilder.orToState(checkNotBlank(goToState, "goToState must not be null"));
+    }
+
+    @Override
+    public ToStateConditionBuilder<D, E> toStateConditionallyBeforeEvent(Enum<?> goToState) {
+        return toStateConditionallyBeforeEvent(checkNotNull(goToState, "gotoState must not be null").name());
     }
 
     @Override

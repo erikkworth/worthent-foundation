@@ -7,7 +7,6 @@ package com.worthent.foundation.util.state.def;
  * Thrown when there is an error or inconsistency in the state table definition.
  * 
  * @author Erik K. Worth
- * @version $Id: StateDefException.java 2 2011-11-28 00:10:06Z erik.k.worth@gmail.com $
  */
 public class StateDefException extends RuntimeException {
     

@@ -138,6 +138,12 @@ public class StateTableDefBuilderImpl<D extends StateTableData, E extends StateE
 
     @NotNull
     @Override
+    public StateDefBuilder<D, E> withState(@NotNull final Enum<?> state) {
+        return withState(checkNotNull(state, "state must not be null").name());
+    }
+
+    @NotNull
+    @Override
     public StateTableDefBuilder<D, E> appendState(@NotNull final StateDef<D, E> state) {
         states.add(checkNotNull(state, "status must not be null"));
         return this;

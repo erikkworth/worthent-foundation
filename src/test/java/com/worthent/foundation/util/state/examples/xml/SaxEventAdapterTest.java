@@ -56,16 +56,13 @@ public class SaxEventAdapterTest {
     /** The list of purchase orders received */
     private List<PurchaseOrderData> purchaseOrders;
 
-    /** The state table control object */
-    private StateTableControl<XmlEvent> stateTableControl;
-
     /** The class being tested here */
     private SaxEventAdapter saxEventAdapter;
 
     @Before
-    public void setup() throws Exception {
+    public void setup() {
         purchaseOrders = new LinkedList<>();
-        stateTableControl = new XmlObjectBuilderAdapter(
+        final StateTableControl<XmlEvent> stateTableControl = new XmlObjectBuilderAdapter(
                 new ObjectConstructionController<>(PurchaseOrderData.class, purchaseOrders::add));
         saxEventAdapter = new SaxEventAdapter(stateTableControl);
     }

@@ -36,7 +36,6 @@ import java.util.Collection;
  * given state is run.
  * 
  * @author Erik K. Worth
- * @version $Id: StateDef.java 2 2011-11-28 00:10:06Z erik.k.worth@gmail.com $
  */
 public interface StateDef<D extends StateTableData, E extends StateEvent> {
 

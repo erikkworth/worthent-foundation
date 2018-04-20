@@ -69,7 +69,7 @@ public class AbstractStateTableData implements StateTableData {
      * @return the current state of the state table instance
      */
     @Nullable
-    public final String getCurrentState() {
+    public String getCurrentState() {
         return currentState;
     }
 
@@ -78,7 +78,7 @@ public class AbstractStateTableData implements StateTableData {
      *
      * @param currentState set the current state of the state table typically as the result of a completed transition
      */
-    public final void setCurrentState(@Nullable final String currentState) {
+    public void setCurrentState(@Nullable final String currentState) {
         this.currentState = currentState;
     }
 
@@ -88,7 +88,7 @@ public class AbstractStateTableData implements StateTableData {
      * @return the prior state of the state table instance
      */
     @Nullable
-    public final String getPriorState() {
+    public String getPriorState() {
         return priorState;
     }
 
@@ -98,7 +98,7 @@ public class AbstractStateTableData implements StateTableData {
      * @param priorState set the prior state of the state table typically from the previous current state as the result
      *                   of a completed transition
      */
-    public final void setPriorState(@Nullable final String priorState) {
+    public void setPriorState(@Nullable final String priorState) {
         this.priorState = priorState;
     }
 

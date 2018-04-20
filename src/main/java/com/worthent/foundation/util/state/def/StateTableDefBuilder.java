@@ -44,6 +44,15 @@ public interface StateTableDefBuilder<D extends StateTableData, E extends StateE
     StateDefBuilder<D, E> withState(@NotNull String stateName);
 
     /**
+     * Returns a new builder for a state in the state table with the provided name
+     *
+     * @param state the state to start defining
+     * @return a reference to the state definition builder
+     */
+    @NotNull
+    StateDefBuilder<D, E> withState(@NotNull Enum<?> state);
+
+    /**
      * Appends a state definition to the state table
      *
      * @param state the state definition to append to the state table

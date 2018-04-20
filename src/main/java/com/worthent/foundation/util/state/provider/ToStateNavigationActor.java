@@ -11,6 +11,8 @@ import com.worthent.foundation.util.state.def.impl.ToStateCondition;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.worthent.foundation.util.condition.Preconditions.checkNotNull;
 
@@ -33,6 +35,11 @@ public class ToStateNavigationActor<D extends StateTableData, E extends StateEve
      */
     public ToStateNavigationActor(@NotNull final List<ToStateCondition<D, E>> toStateConditions) {
         this.toStateConditions = checkNotNull(toStateConditions, "toStateConditions must not be null");
+    }
+
+    /** @return the set of states to which this actor may direct the state transition */
+    public Set<String> getPossibleTargetStates() {
+        return toStateConditions.stream().map(ToStateCondition::getToState).collect(Collectors.toSet());
     }
 
     @Override

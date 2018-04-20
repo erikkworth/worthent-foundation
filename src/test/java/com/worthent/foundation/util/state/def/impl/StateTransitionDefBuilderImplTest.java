@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -66,45 +67,45 @@ public class StateTransitionDefBuilderImplTest {
     private TransitionActorManager<StateTableData, StateEvent> transitionActorManager;
 
     @Before
-    public void setup() throws Exception {
+    public void setup() {
         initMocks(this);
         transitionActorManager = new TransitionActorManager<>();
     }
 
     @Test(expected=IllegalArgumentException.class)
-    public void transitionBuilder_constructorWithNullTransitionManagerTest() throws Exception {
+    public void transitionBuilder_constructorWithNullTransitionManagerTest() {
         final TransitionActorManager<StateTableData, StateEvent> noTransitionActorManager = null;
         new StateTransitionDefBuilderImpl<>(null, noTransitionActorManager, "testEvent");
     }
 
     @Test(expected=IllegalArgumentException.class)
-    public void transitionBuilder_constructorWithNullEventTest() throws Exception {
+    public void transitionBuilder_constructorWithNullEventTest() {
         final String noEventName = null;
         new StateTransitionDefBuilderImpl<>(null, transitionActorManager, noEventName);
     }
 
     @Test(expected=IllegalArgumentException.class)
-    public void transitionBuilder_constructorWithBlankEventTest() throws Exception {
+    public void transitionBuilder_constructorWithBlankEventTest() {
         final String blankEventName = "";
         new StateTransitionDefBuilderImpl<>(null, transitionActorManager, blankEventName);
     }
 
     @Test(expected=IllegalArgumentException.class)
-    public void transitionBuilder_toStateWithNullStateTest() throws Exception {
+    public void transitionBuilder_toStateWithNullStateTest() {
         final String onEvent = "testEvent";
         final String nullState = null;
         new StateTransitionDefBuilderImpl<>(null, transitionActorManager, onEvent).toState(nullState);
     }
 
     @Test(expected=IllegalArgumentException.class)
-    public void transitionBuilder_toStateWithBlankStateTest() throws Exception {
+    public void transitionBuilder_toStateWithBlankStateTest() {
         final String onEvent = "testEvent";
         final String blankState = " ";
         new StateTransitionDefBuilderImpl<>(null, transitionActorManager, onEvent).toState(blankState);
     }
 
     @Test(expected=IllegalArgumentException.class)
-    public void transitionBuilder_withActorWithNullActorTest() throws Exception {
+    public void transitionBuilder_withActorWithNullActorTest() {
         final String onEvent = "testEvent";
         final String toState = "targetState";
         final TransitionActor<StateTableData, StateEvent> nullActor = null;
@@ -112,7 +113,7 @@ public class StateTransitionDefBuilderImplTest {
     }
 
     @Test(expected=IllegalArgumentException.class)
-    public void transitionBuilder_withActorsByNameWithNullActorNamesTest() throws Exception {
+    public void transitionBuilder_withActorsByNameWithNullActorNamesTest() {
         final String onEvent = "testEvent";
         final String toState = "targetState";
         final String[] nullActorNames = null;
@@ -120,14 +121,14 @@ public class StateTransitionDefBuilderImplTest {
     }
 
     @Test
-    public void transitionBuilder_withActorsByNameWithNoActorNamesTest() throws Exception {
+    public void transitionBuilder_withActorsByNameWithNoActorNamesTest() {
         final String onEvent = "testEvent";
         final String toState = "targetState";
         new StateTransitionDefBuilderImpl<>(null, transitionActorManager, onEvent).toState(toState).withActorsByName();
     }
 
     @Test(expected=IllegalStateException.class)
-    public void transitionBuilder_withActorsByNameWithMissingActorTest() throws Exception {
+    public void transitionBuilder_withActorsByNameWithMissingActorTest() {
         final String onEvent = "testEvent";
         final String toState = "targetState";
         final String noSuchActor = "bogusActor";
@@ -135,20 +136,20 @@ public class StateTransitionDefBuilderImplTest {
     }
 
     @Test(expected=IllegalStateException.class)
-    public void transitionBuilder_endTransitionWithNoParentBuilderTest() throws Exception {
+    public void transitionBuilder_endTransitionWithNoParentBuilderTest() {
         final String onEvent = "testEvent";
         final String toState = "targetState";
         new StateTransitionDefBuilderImpl<>(null, transitionActorManager, onEvent).toState(toState).endTransition();
     }
 
     @Test(expected=IllegalStateException.class)
-    public void transitionBuilder_buildWithNoTargetStateTest() throws Exception {
+    public void transitionBuilder_buildWithNoTargetStateTest() {
         final String onEvent = "testEvent";
         new StateTransitionDefBuilderImpl<>(null, transitionActorManager, onEvent).build();
     }
 
     @Test
-    public void transitionBuilder_oneActorInstanceTest() throws Exception {
+    public void transitionBuilder_oneActorInstanceTest() {
         final String onEvent = "testEvent";
         final String toState = "targetState";
         final TransitionActor<StateTableData, StateEvent> actor = context -> LOGGER.debug("Acted");
@@ -165,7 +166,7 @@ public class StateTransitionDefBuilderImplTest {
     }
 
     @Test
-    public void transitionBuilder_oneNamedActorTest() throws Exception {
+    public void transitionBuilder_oneNamedActorTest() {
         final String actorName = "testActor";
         final String onEvent = "testEvent";
         final String toState = "targetState";
@@ -183,7 +184,7 @@ public class StateTransitionDefBuilderImplTest {
     }
 
     @Test
-    public void transitionBuilder_twoNamedActorsTest() throws Exception {
+    public void transitionBuilder_twoNamedActorsTest() {
         final String actorName1 = "testActor1";
         final String actorName2 = "testActor2";
         final String onEvent = "testEvent";
@@ -212,8 +213,28 @@ public class StateTransitionDefBuilderImplTest {
         assertEquals("Transition Context", transitionContext, transitionContextCaptor.getValue());
     }
 
+    @Test
+    public void transitionBuilder_withConditionalTargetStateTest() {
+        final String actorName = "testActor";
+        final String onEvent = "testEvent";
+        final String toState1 = "targetState1";
+        final String toState2 = "targetState2";
+        when(actor1.getName()).thenReturn(actorName);
+        transitionActorManager.addTransitionActor(actor1);
+        final StateTransitionDefBuilderImpl<StateTableData, StateEvent> transitionBuilder =
+                new StateTransitionDefBuilderImpl<>(null, transitionActorManager, onEvent);
+        final StateTransitionDef<StateTableData, StateEvent> transition = transitionBuilder
+                .toStateConditionally(toState1).when(test -> true).elseGoToState(toState2)
+                .withActorsByName(actorName)
+                .build();
+        assertExpectedTransition(transition, onEvent, StateDef.STATE_CHANGE_BY_ACTOR, Collections.singletonList(actor1));
+        verify(actor1).onAction(transitionContextCaptor.capture());
+        assertEquals("Transition Context", transitionContext, transitionContextCaptor.getValue());
+        assertThat(transition.getPotentialTargetStateNames()).containsOnly(toState1, toState2);
+    }
+
     @Test(expected=StateExeException.class)
-    public void stateTransitionDefs_getUnexpectedEventDefaultTransition() throws Exception {
+    public void stateTransitionDefs_getUnexpectedEventDefaultTransition() {
         final String onEvent = StateTransitionDef.DEFAULT_HANDLER_EVENT_ID;
         final String toState = StateDef.STAY_IN_STATE;
         final StateEvent mockEvent = mock(StateEvent.class);
@@ -229,7 +250,7 @@ public class StateTransitionDefBuilderImplTest {
     }
 
     @Test
-    public void stateTransitionDefs_getNoActionTransition() throws Exception {
+    public void stateTransitionDefs_getNoActionTransition() {
         final String onEvent = "testEvent";
         final String toState = "targetState";
         final StateTransitionDef<StateTableData, StateEvent> transition =

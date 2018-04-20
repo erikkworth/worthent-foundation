@@ -8,7 +8,7 @@ import com.worthent.foundation.util.annotation.Nullable;
  *
  * @author Erik K. Worth
  */
-public interface StateEventBuilder extends StateEventWithDataMap {
+public interface StateEventBuilder<E extends StateEventWithDataMap> extends StateEventWithDataMap {
 
     /**
      * Appends a data item to state event
@@ -26,5 +26,5 @@ public interface StateEventBuilder extends StateEventWithDataMap {
      * @return a new instance of the state event
      */
     @NotNull
-    StateEvent build();
+    E build();
 }

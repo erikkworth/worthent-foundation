@@ -17,10 +17,21 @@ public interface StateEventWithDataMap extends StateEvent {
      *
      * @param key the identifier for the data item
      * @param <T> the type of the data item
-     * @return the data item value identified by the key
+     * @return the data item value identified by the key or <code>null</code> when not present
      */
     @Nullable
     <T> T getEventData(@Nullable String key);
+
+    /**
+     * Returns an element of data by its key
+     *
+     * @param key the identifier for the data item
+     * @param <T> the type of the data item
+     * @return the data item value identified by the key
+     * @throws NullPointerException when the key does not identify a data value
+     */
+    @NotNull
+    <T> T getRequiredEventData(@Nullable String key);
 
     /**
      * Returns all the event data

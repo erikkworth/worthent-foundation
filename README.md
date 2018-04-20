@@ -10,13 +10,13 @@ The utilities require **Java 1.8** or above.
 <dependency>
     <groupId>com.worthent.foundation</groupId>
     <artifactId>worthent-foundation</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
 </dependency>
 ```
 
 **Gradle:**
 ```
-compile 'com.worthent.foundation:worthent-foundation:1.0.0'
+compile 'com.worthent.foundation:worthent-foundation:1.0.1'
 ```
 The foundation distribution includes these utilities:
 

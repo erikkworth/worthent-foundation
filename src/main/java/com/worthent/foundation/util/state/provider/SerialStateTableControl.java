@@ -16,7 +16,6 @@ import static com.worthent.foundation.util.condition.Preconditions.checkNotNull;
  * processed.
  * 
  * @author Erik K. Worth
- * @version $Id: SerialStateTableControl.java 2 2011-11-28 00:10:06Z erik.k.worth@gmail.com $
  */
 public class SerialStateTableControl<D extends StateTableData, E extends StateEvent> implements StateTableControl<E> {
 

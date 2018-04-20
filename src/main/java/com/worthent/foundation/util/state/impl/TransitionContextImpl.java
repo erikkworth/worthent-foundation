@@ -8,6 +8,9 @@ import com.worthent.foundation.util.state.StateTable;
 import com.worthent.foundation.util.state.StateTableControl;
 import com.worthent.foundation.util.state.StateTableData;
 import com.worthent.foundation.util.state.TransitionContext;
+import com.worthent.foundation.util.state.def.StateTransitionDef;
+
+import java.util.Set;
 
 /**
  * Encapsulates all the elements involved in the state table transition.
@@ -65,5 +68,11 @@ public class TransitionContextImpl<D extends StateTableData, E extends StateEven
     @Override
     public E getEvent() {
         return event;
+    }
+
+    public Set<String> getPotentialTargetStates() {
+        return stateTable.getStateTableDefinition()
+                .getTransition(fromState, event.getName())
+                .getPotentialTargetStateNames();
     }
 }

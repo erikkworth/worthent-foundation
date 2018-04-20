@@ -11,7 +11,14 @@ import com.worthent.foundation.util.state.TransitionContext;
  */
 public interface ToStateCondition<D extends StateTableData, E extends StateEvent> {
 
+    /** @return the state to which the transition will go if the test condition returns <code>true</code> */
     String getToState();
 
+    /**
+     * The default implementation of the test condition always returns <code>true</code>.
+     *
+     * @param transitionContext the context for the state transition
+     * @return the result of the test
+     */
     default boolean test(TransitionContext<D, E> transitionContext) {return true;}
 }

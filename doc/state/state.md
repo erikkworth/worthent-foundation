@@ -159,7 +159,7 @@ public class TurnstileData extends AbstractStateTableData {
 
     /** Construct in initial state */
     public TurnstileData() {
-        super(TurnstileStates.OFF.name(), TurnstileStates.OFF.name());
+        super(TurnstileStates.OFF, TurnstileStates.OFF);
         turnCount = 0;
         ticketCount = 0;
     }
@@ -182,9 +182,9 @@ public class TurnstileData extends AbstractStateTableData {
     @Actor(name = INCREMENT_COUNT)
     public void increment(final TransitionContext<TurnstileData, StateEvent> context) {
         final String eventName = context.getEvent().getName();
-        if (TurnstileEventType.PUSH.name().equals(eventName)) {
+        if (TurnstileEventType.PUSH.equals(eventName)) {
             turnCount++;
-        } else if (TurnstileEventType.TICKET.name().equals(eventName)) {
+        } else if (TurnstileEventType.TICKET.equals(eventName)) {
             ticketCount++;
         }
     }
@@ -327,26 +327,26 @@ private final StateTable<TurnstileData, StateEvent> turnstileStateTable =
         .withStateTableDefinition()
             .setName("Turnstile")
             .usingActorsInClass(TurnstileData.class)
-            .withState(TurnstileStates.OFF.name())
-                .transitionOnEvent(TurnstileEventType.ON.name()).toState(TurnstileStates.LOCKED.name()).endTransition()
+            .withState(TurnstileStates.OFF)
+                .transitionOnEvent(TurnstileEventType.ON).toState(TurnstileStates.LOCKED).endTransition()
                 .withDefaultEventHandler().toState(StateDef.STAY_IN_STATE).endTransition()
                 .endState()
-            .withState(TurnstileStates.LOCKED.name())
-                .transitionOnEvent(TurnstileEventType.TICKET.name())
-                    .toState(TurnstileStates.UNLOCKED.name())
+            .withState(TurnstileStates.LOCKED)
+                .transitionOnEvent(TurnstileEventType.TICKET)
+                    .toState(TurnstileStates.UNLOCKED)
                     .withActorsByName(TurnstileData.INCREMENT_COUNT)
                     .endTransition()
-                .transitionOnEvent(TurnstileEventType.PUSH.name()).toState(StateDef.STAY_IN_STATE).endTransition()
-                .transitionOnEvent(TurnstileEventType.OFF.name()).toState(TurnstileStates.OFF.name()).endTransition()
+                .transitionOnEvent(TurnstileEventType.PUSH).toState(StateDef.STAY_IN_STATE).endTransition()
+                .transitionOnEvent(TurnstileEventType.OFF).toState(TurnstileStates.OFF).endTransition()
                 .withDefaultEventHandler(StateTransitionDefs.getUnexpectedEventDefaultTransition())
                 .endState()
-            .withState(TurnstileStates.UNLOCKED.name())
-                .transitionOnEvent(TurnstileEventType.TICKET.name()).toState(StateDef.STAY_IN_STATE).endTransition()
-                .transitionOnEvent(TurnstileEventType.PUSH.name())
-                    .toState(TurnstileStates.LOCKED.name())
+            .withState(TurnstileStates.UNLOCKED)
+                .transitionOnEvent(TurnstileEventType.TICKET).toState(StateDef.STAY_IN_STATE).endTransition()
+                .transitionOnEvent(TurnstileEventType.PUSH)
+                    .toState(TurnstileStates.LOCKED)
                     .withActorsByName(TurnstileData.INCREMENT_COUNT)
                     .endTransition()
-                .transitionOnEvent(TurnstileEventType.OFF.name()).toState(TurnstileStates.OFF.name()).endTransition()
+                .transitionOnEvent(TurnstileEventType.OFF).toState(TurnstileStates.OFF).endTransition()
                 .withDefaultEventHandler(StateTransitionDefs.getUnexpectedEventDefaultTransition())
                 .endState()
             .endDefinition()
@@ -421,8 +421,8 @@ You can see that the `StateTableControl` object takes a generic argument to spec
 There are (or will be) multiple implementations of the `StateTableControl` that differ primarily by their threading models:
 
 * `SerialStateTableControl`: This is a thread-unsafe implementation that is meant to be constructed and used within the processing of some high-level request all in the same thread.  It does not start a thread.  Any exceptions thrown during the state table execution propagate up through the method that signals the event.  This is a good candidate for more real-time processing and for parsers.
-* `SingleThreadConsumerStateTableControl` (not yet implemented in v1.0): This implementation is thread safe and directs all events to a queue that is consumed by a single thread that feeds the events to the state table in the order received (with the exception of events submitted by an actor).  This version is good for processing transactional events where order is important but throughput is less important.
-* `MultiThreadedConsumerStateTableControl` (not yet implemented in v1.0): This implementation is thread safe and uses a hash algorithm to dispatch a value from the event (a data ID) to one of multiple queues each of which have their own thread consuming events and feeding them into the state table.  This provides a higher throughput capacity while preserving the order for events with the same data ID.
+* `SingleThreadConsumerStateTableControl` (implemented in v1.0.1): This implementation is thread safe and directs all events to a queue that is consumed by a single thread that feeds the events to the state table in the order received (with the exception of events submitted by an actor).  This version is good for processing transactional events where order is important but throughput is less important.
+* `MultiThreadedConsumerStateTableControl` (not yet implemented as of v1.0.1): This implementation is thread safe and uses a hash algorithm to dispatch a value from the event (a data ID) to one of multiple queues each of which have their own thread consuming events and feeding them into the state table.  This provides a higher throughput capacity while preserving the order for events with the same data ID.
 
 The `SerialStateTableControl` objects invokes the initializer on the State Table Data Manager.
 
@@ -799,16 +799,16 @@ public class XmlObjectBuilderAdapter implements StateTableControl<XmlEvent> {
                 .withStateTableDefinition()
                 .setName("XMLObjectBuilderAdapter")
                 .usingActorsInClass(XmlData.class)
-                .withState(XmlObjectStates.AWAITING_DOCUMENT.name())
+                .withState(XmlObjectStates.AWAITING_DOCUMENT)
                     .transitionOnEvent(SaxEventAdapter.START_DOCUMENT)
-                        .toState(XmlObjectStates.AWAITING_OBJECT_ELEMENT_START.name())
+                        .toState(XmlObjectStates.AWAITING_OBJECT_ELEMENT_START)
                         .withActorsByName(XmlData.PROCESS_DOCUMENT_START)
                         .endTransition()
                     .withDefaultEventHandler(StateTransitionDefs.getUnexpectedEventDefaultTransition())
                     .endState()
-                .withState(XmlObjectStates.AWAITING_OBJECT_ELEMENT_START.name())
+                .withState(XmlObjectStates.AWAITING_OBJECT_ELEMENT_START)
                     .transitionOnEvent(SaxEventAdapter.START_ELEMENT)
-                        .toState(XmlObjectStates.BUILDING_OBJECT.name())
+                        .toState(XmlObjectStates.BUILDING_OBJECT)
                         .withActorsByName(XmlData.PROCESS_ELEMENT_START, XmlData.SIGNAL_ROOT_START)
                         .endTransition()
                     .transitionOnEvent((SaxEventAdapter.WHITESPACE))
@@ -817,13 +817,13 @@ public class XmlObjectBuilderAdapter implements StateTableControl<XmlEvent> {
                         .endTransition()
                     .withDefaultEventHandler(StateTransitionDefs.getUnexpectedEventDefaultTransition())
                     .endState()
-                .withState(XmlObjectStates.BUILDING_OBJECT.name())
+                .withState(XmlObjectStates.BUILDING_OBJECT)
                     .transitionOnEvent(SaxEventAdapter.START_ELEMENT)
-                        .toState(XmlObjectStates.BUILDING_OBJECT.name())
+                        .toState(XmlObjectStates.BUILDING_OBJECT)
                         .withActorsByName(XmlData.PROCESS_ELEMENT_START, XmlData.SIGNAL_ENTITY_START)
                         .endTransition()
                     .transitionOnEvent(SaxEventAdapter.CHARACTER_DATA)
-                        .toState(XmlObjectStates.BUILDING_FIELD.name())
+                        .toState(XmlObjectStates.BUILDING_FIELD)
                         .withActorsByName(XmlData.PROCESS_CHARACTER_DATA)
                         .endTransition()
                     .transitionOnEvent(SaxEventAdapter.WHITESPACE)
@@ -831,16 +831,16 @@ public class XmlObjectBuilderAdapter implements StateTableControl<XmlEvent> {
                         .withActorsByName(XmlData.PROCESS_WHITESPACE)
                         .endTransition()
                     .transitionOnEvent(SaxEventAdapter.END_ELEMENT)
-                        .toState(XmlObjectStates.BUILDING_OBJECT.name())
+                        .toState(XmlObjectStates.BUILDING_OBJECT)
                         .withActorsByName(XmlData.PROCESS_ELEMENT_END, XmlData.SIGNAL_OBJECT_DONE)
                         .endTransition()
                     .transitionOnEvent(SaxEventAdapter.END_DOCUMENT)
-                        .toState(XmlObjectStates.AWAITING_DOCUMENT.name())
+                        .toState(XmlObjectStates.AWAITING_DOCUMENT)
                         .withActorsByName(XmlData.PROCESS_DOCUMENT_END)
                         .endTransition()
                     .withDefaultEventHandler(StateTransitionDefs.getUnexpectedEventDefaultTransition())
                     .endState()
-                .withState(XmlObjectStates.BUILDING_FIELD.name())
+                .withState(XmlObjectStates.BUILDING_FIELD)
                     .transitionOnEvent(SaxEventAdapter.CHARACTER_DATA)
                         .toState(StateDef.STAY_IN_STATE)
                         .withActorsByName(XmlData.PROCESS_CHARACTER_DATA)
@@ -850,7 +850,7 @@ public class XmlObjectBuilderAdapter implements StateTableControl<XmlEvent> {
                         .withActorsByName(XmlData.PROCESS_WHITESPACE)
                         .endTransition()
                     .transitionOnEvent(SaxEventAdapter.END_ELEMENT)
-                        .toState(XmlObjectStates.BUILDING_OBJECT.name())
+                        .toState(XmlObjectStates.BUILDING_OBJECT)
                         .withActorsByName(XmlData.PROCESS_ELEMENT_END, XmlData.SIGNAL_SIMPLE_VALUE)
                         .endTransition()
                     .withDefaultEventHandler(StateTransitionDefs.getUnexpectedEventDefaultTransition())
@@ -959,7 +959,7 @@ public class XmlData extends AbstractStateTableData {
      * Construct with the controller to the state table that is able to build an object structure from events.
      */
     XmlData(@NotNull final StateTableControl<ObjectConstructionEvent> stateTableControl) {
-        super(XmlObjectStates.AWAITING_DOCUMENT.name(), XmlObjectStates.AWAITING_DOCUMENT.name());
+        super(XmlObjectStates.AWAITING_DOCUMENT, XmlObjectStates.AWAITING_DOCUMENT);
         this.stateTableControl = checkNotNull(stateTableControl, "stateTableControl must not be null");
         elementStack = new LinkedList<>();
         fieldValue = new StringBuilder();
@@ -1142,9 +1142,9 @@ public class ObjectConstructionController<T> implements StateTableControl<Object
                 .withStateTableDefinition()
                 .setName("ObjectBuilder")
                 .usingActorsInClass(ObjectData.class)
-                .withState(ObjectStates.AWAITING_ROOT_START.name())
+                .withState(ObjectStates.AWAITING_ROOT_START)
                     .transitionOnEvent(ObjectConstructionEvent.EVENT_ROOT_START)
-                        .toState(ObjectStates.AWAITING_ENTITY_START.name())
+                        .toState(ObjectStates.AWAITING_ENTITY_START)
                         .withActorsByName(ObjectData.PROCESS_ROOT_START)
                         .endTransition()
                     .transitionOnEvent(ObjectConstructionEvent.EVENT_DONE)
@@ -1153,47 +1153,47 @@ public class ObjectConstructionController<T> implements StateTableControl<Object
                         .endTransition()
                     .withDefaultEventHandler(StateTransitionDefs.getUnexpectedEventDefaultTransition())
                     .endState()
-                .withState(ObjectStates.AWAITING_ENTITY_START.name())
+                .withState(ObjectStates.AWAITING_ENTITY_START)
                     .transitionOnEvent(ObjectConstructionEvent.EVENT_ENTITY_START)
-                        .toStateConditionallyBeforeEvent(ObjectStates.BUILDING_LIST.name())
+                        .toStateConditionallyBeforeEvent(ObjectStates.BUILDING_LIST)
                             .when(ObjectData::isBuildingList)
-                            .elseGoToState(ObjectStates.BUILDING_ENTITY.name())
+                            .elseGoToState(ObjectStates.BUILDING_ENTITY)
                         .withActorsByName(ObjectData.PROCESS_ENTITY_START)
                         .endTransition()
                     .transitionOnEvent(ObjectConstructionEvent.EVENT_OBJECT_DONE)
-                        .toStateConditionally(ObjectStates.BUILDING_LIST.name())
+                        .toStateConditionally(ObjectStates.BUILDING_LIST)
                             .when(ObjectData::isBuildingList)
                             .elseStayInState()
                         .withActorsByName(ObjectData.PROCESS_OBJECT_DONE)
                         .endTransition()
                     .transitionOnEvent(ObjectConstructionEvent.EVENT_DONE)
-                        .toState(ObjectStates.AWAITING_ROOT_START.name())
+                        .toState(ObjectStates.AWAITING_ROOT_START)
                         .withActorsByName(ObjectData.PROCESS_DONE)
                         .endTransition()
                     .withDefaultEventHandler(StateTransitionDefs.getUnexpectedEventDefaultTransition())
                     .endState()
-                .withState(ObjectStates.BUILDING_ENTITY.name())
+                .withState(ObjectStates.BUILDING_ENTITY)
                     .transitionOnEvent(ObjectConstructionEvent.EVENT_ENTITY_START)
-                        .toState(ObjectStates.AWAITING_ENTITY_START.name())
+                        .toState(ObjectStates.AWAITING_ENTITY_START)
                         .withActorsByName(ObjectData.PROCESS_NESTED_ENTITY_START)
                         .endTransition()
                     .transitionOnEvent(ObjectConstructionEvent.EVENT_SIMPLE_VALUE)
-                        .toState(ObjectStates.AWAITING_ENTITY_START.name())
+                        .toState(ObjectStates.AWAITING_ENTITY_START)
                         .withActorsByName(ObjectData.PROCESS_SIMPLE_VALUE)
                         .endTransition()
                     .transitionOnEvent(ObjectConstructionEvent.EVENT_OBJECT_DONE)
-                        .toState(ObjectStates.AWAITING_ENTITY_START.name())
+                        .toState(ObjectStates.AWAITING_ENTITY_START)
                         .withActorsByName(ObjectData.PROCESS_OBJECT_DONE)
                         .endTransition()
                     .withDefaultEventHandler(StateTransitionDefs.getUnexpectedEventDefaultTransition())
                     .endState()
-                .withState(ObjectStates.BUILDING_LIST.name())
+                .withState(ObjectStates.BUILDING_LIST)
                     .transitionOnEvent(ObjectConstructionEvent.EVENT_ENTITY_START)
-                        .toState(ObjectStates.AWAITING_ENTITY_START.name())
+                        .toState(ObjectStates.AWAITING_ENTITY_START)
                         .withActorsByName(ObjectData.PROCESS_NESTED_ENTITY_START)
                         .endTransition()
                     .transitionOnEvent(ObjectConstructionEvent.EVENT_OBJECT_DONE)
-                        .toState(ObjectStates.AWAITING_ENTITY_START.name())
+                        .toState(ObjectStates.AWAITING_ENTITY_START)
                         .withActorsByName(ObjectData.PROCESS_OBJECT_DONE)
                         .endTransition()
                     .withDefaultEventHandler(StateTransitionDefs.getUnexpectedEventDefaultTransition())
@@ -1285,7 +1285,7 @@ public class ObjectData<T> extends AbstractStateTableData {
     private String itemName;
 
     ObjectData(@NotNull final Class<T> objectClass, @NotNull final Consumer<T> resultConsumer) {
-        super(ObjectStates.AWAITING_ROOT_START.name(), ObjectStates.AWAITING_ROOT_START.name());
+        super(ObjectStates.AWAITING_ROOT_START, ObjectStates.AWAITING_ROOT_START);
         this.objectClass = checkNotNull(objectClass, "objectClass must not be null");
         this.resultConsumer = checkNotNull(resultConsumer, "resultConsumer must not be null");
         this.objectBuilderStack = new LinkedList<>();

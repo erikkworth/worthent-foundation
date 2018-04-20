@@ -23,13 +23,24 @@ public class ToStateConditionListBuilderImpl<D extends StateTableData, E extends
     extends AbstractChildBuilder<StateTransitionDefBuilderImpl<D, E>>
         implements ToStateConditionListBuilder<D, E> {
 
+    /** Enumerates the points before and after actors are run when the condition can be checked */
     public enum CheckPosition {
         BEFORE_ACTORS,
-        AFTER_ACTORS;
+        AFTER_ACTORS
     }
+
+    /** The point before or after actors are run when the condition is checked */
     private final CheckPosition checkPosition;
+
+    /** The list of conditional state transitions being built */
     private final List<ToStateCondition<D, E>> toStateConditions;
 
+    /**
+     * Construct from the parent builder and the position where the condition is to be checked.
+     *
+     * @param parentBuilder the parent builder
+     * @param checkPosition the position where the condition is to be checked (before or after actors are run)
+     */
     ToStateConditionListBuilderImpl(
             @NotNull final StateTransitionDefBuilderImpl<D, E> parentBuilder,
             @NotNull final CheckPosition checkPosition) {
@@ -43,10 +54,19 @@ public class ToStateConditionListBuilderImpl<D extends StateTableData, E extends
     }
 
     @Override
+    @NotNull
     public ToStateConditionBuilder<D, E> orToState(@NotNull final String toStateName) {
         return new ToStateConditionBuilderImpl<>(this, checkNotNull(toStateName, "toStateName must not be null"));
     }
 
+    @Override
+    @NotNull
+    public ToStateConditionBuilder<D, E> orToState(@NotNull final Enum<?> toState) {
+        return new ToStateConditionBuilderImpl<>(this, checkNotNull(toState, "toState must not be null").name());
+    }
+
+    @Override
+    @NotNull
     public StateTransitionDefBuilder<D, E> elseFail() {
         // The resulting actor fails when none of the conditions are satisfied, so we do nothing here.
         final StateTransitionDefBuilderImpl<D, E> parentBuilder = getParentBuilder();
@@ -54,6 +74,8 @@ public class ToStateConditionListBuilderImpl<D extends StateTableData, E extends
         return parentBuilder;
     }
 
+    @Override
+    @NotNull
     public StateTransitionDefBuilder<D, E> elseStayInState() {
         final StateTransitionDefBuilderImpl<D, E> parentBuilder = getParentBuilder();
         // Add a condition that always returns true and where the To State directs it to stay in the current state
@@ -63,11 +85,18 @@ public class ToStateConditionListBuilderImpl<D extends StateTableData, E extends
     }
 
     @Override
+    @NotNull
     public StateTransitionDefBuilder<D, E> elseGoToState(@NotNull String toStateName) {
         final StateTransitionDefBuilderImpl<D, E> parentBuilder = getParentBuilder();
         // Add a condition that always returns true and where the To State directs it to go to the specified state
         toStateConditions.add(() -> toStateName);
         parentBuilder.setToStateConditions(toStateConditions, checkPosition);
         return parentBuilder;
+    }
+
+    @Override
+    @NotNull
+    public StateTransitionDefBuilder<D, E> elseGoToState(@NotNull Enum<?> toState) {
+        return elseGoToState(checkNotNull(toState, "toState must not be null").name());
     }
 }

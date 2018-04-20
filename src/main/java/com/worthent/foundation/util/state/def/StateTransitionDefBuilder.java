@@ -25,6 +25,15 @@ public interface StateTransitionDefBuilder<D extends StateTableData, E extends S
     StateTransitionDefBuilder<D, E> toState(@NotNull String targetStateName);
 
     /**
+     * Transition to this state for the provided event
+     *
+     * @param targetState the target state of the state transition
+     * @return a reference to this builder
+     */
+    @NotNull
+    StateTransitionDefBuilder<D, E> toState(@NotNull Enum<?> targetState);
+
+    /**
      * Transition to the state when the corresponding condition is satisfied (after processing the event)
      *
      * @param goToState the target state based on the first condition built by the returned builder
@@ -34,12 +43,31 @@ public interface StateTransitionDefBuilder<D extends StateTableData, E extends S
     ToStateConditionBuilder<D, E> toStateConditionally(@NotNull String goToState);
 
     /**
+     * Transition to the state when the corresponding condition is satisfied (after processing the event)
+     *
+     * @param goToState the target state based on the first condition built by the returned builder
+     * @return a reference to transition condition builder
+     */
+    @NotNull
+    ToStateConditionBuilder<D, E> toStateConditionally(@NotNull Enum<?> goToState);
+
+    /**
      * Transition to the state when the corresponding condition is satisfied (before processing the event)
      *
      * @param goToState the target state based on the first condition built by the returned builder
      * @return a reference to the transition condition builder
      */
+    @NotNull
     ToStateConditionBuilder<D, E> toStateConditionallyBeforeEvent(@NotNull String goToState);
+
+    /**
+     * Transition to the state when the corresponding condition is satisfied (before processing the event)
+     *
+     * @param goToState the target state based on the first condition built by the returned builder
+     * @return a reference to the transition condition builder
+     */
+    @NotNull
+    ToStateConditionBuilder<D, E> toStateConditionallyBeforeEvent(@NotNull Enum<?> goToState);
 
     /**
      * Have this actor perform its function in the order added during the state transition

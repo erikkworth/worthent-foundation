@@ -24,6 +24,15 @@ public interface StateDefBuilder<D extends StateTableData, E extends StateEvent>
     StateTransitionDefBuilder<D, E> transitionOnEvent(@NotNull String eventName);
 
     /**
+     * Start building a state transition for this state on the provided event name
+     *
+     * @param event the event that triggers the state transition
+     * @return a reference to this builder
+     */
+    @NotNull
+    StateTransitionDefBuilder<D, E> transitionOnEvent(@NotNull Enum<?> event);
+
+    /**
      * Specifies the default state transition handler that handles events not specifically handled by other transitions
      *
      * @return a reference to this builder

@@ -63,6 +63,12 @@ public class StateDefBuilderImpl<D extends StateTableData, E extends StateEvent>
 
     @Override
     @NotNull
+    public StateTransitionDefBuilder<D, E> transitionOnEvent(@NotNull final Enum<?> event) {
+        return transitionOnEvent(checkNotNull(event, "event must not be blank").name());
+    }
+
+    @Override
+    @NotNull
     public StateTransitionDefBuilder<D, E> withDefaultEventHandler() {
         return new StateTransitionDefBuilderImpl<>(this, transitionActorManager, StateTransitionDefImpl.DEFAULT_HANDLER_EVENT_ID);
     }
